@@ -1,4 +1,4 @@
-# Data on fire arms 
+# Data on firearms 
 
 ## Downlad and clean datasets 
 
