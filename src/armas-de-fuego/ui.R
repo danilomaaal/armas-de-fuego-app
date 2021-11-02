@@ -13,7 +13,29 @@ library(shiny)
 library(dplyr)
 library(plotly)
 
+# read data
+PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
+
 # user interface scheme
 shinyUI(
-  # code goes here
-)
+  fluidPage(
+    titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales en México"),
+    sidebarLayout(
+      sidebarPanel(
+        selectInput("state",
+                    "Selecciona un Estado:",
+                    choices = c("Nacional",unique(PoliceFirearms$estado))),
+        sliderInput("year",
+                    "Selecciona un año:",
+                    min = min(PoliceFirearms$ano),
+                    max = max(PoliceFirearms$ano),
+                    sep = "",
+                    value = c(2006, 2018),step = 1)
+                    ),
+        mainPanel(
+          plotlyOutput("barplot")
+        )
+      )
+    )
+  )
+
