@@ -48,7 +48,13 @@ shinyUI(
         checkboxInput("checkbox",label="Periodo",value=TRUE)
         ),
         mainPanel(
-          plotlyOutput("barplot")
+          tabsetPanel(
+            tabPanel("Costo",
+                     plotlyOutput("barplot")),
+            tabPanel("Tendencia",
+                     plotlyOutput("lineplot")
+            )
+          )
         )
       )
     )
