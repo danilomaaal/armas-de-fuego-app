@@ -35,17 +35,17 @@ shinyServer(function(input, output) {
                  estado == input$state) %>%
           group_by(marca) %>%
           summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
-      } else if(input$state=="Nacional" & input$checkbox==TRUE){
-        PoliceFirearms %>%
-          filter(ano >= input$years[1],
-                 ano <= input$years[2]) %>%
-          group_by(marca) %>%
-          summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
+        } else if(input$state=="Nacional" & input$checkbox==TRUE){
+          PoliceFirearms %>%
+            filter(ano >= input$years[1],
+                   ano <= input$years[2]) %>%
+            group_by(marca) %>%
+            summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
         } else if (input$state=="Nacional" & input$checkbox==FALSE){
-        PoliceFirearms %>%
-          filter(ano == input$year) %>%
-          group_by(marca) %>%
-          summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
+          PoliceFirearms %>%
+            filter(ano == input$year) %>%
+            group_by(marca) %>%
+            summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
         } else {
           PoliceFirearms %>%
             filter(ano == input$year,
@@ -57,8 +57,7 @@ shinyServer(function(input, output) {
     
     TreemapOutputFunction <- reactive({
       
-      if (input$state=="Nacional") {
-        
+      if (input$state=="Nacional" & input$checkbox==TRUE) {
         PoliceFirearms %>%
           filter(ano >= input$years[1],
                  ano <= input$years[2]) %>%
@@ -67,7 +66,8 @@ shinyServer(function(input, output) {
           summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
                     piezas=sum(no_piezas, na.rm = TRUE))
         
-      } else {
+      } else if(input$state!="Nacional" & input$checkbox==TRUE){
+        
         PoliceFirearms %>%
           filter(ano >= input$years[1],
                  ano <= input$years[2],
@@ -75,8 +75,22 @@ shinyServer(function(input, output) {
           group_by(estado, tipo_es, pais_origen_empresa,marca, calibre) %>%
           summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
                     piezas=sum(no_piezas, na.rm = TRUE))
-      }
-    })
+      } else if (input$state=="Nacional" & input$checkbox==FALSE){
+        PoliceFirearms %>%
+          filter(ano == input$year) %>%
+          mutate(estado="Nacional") %>%
+          group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
+          summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+                    piezas=sum(no_piezas, na.rm = TRUE)) 
+        } else {
+          PoliceFirearms %>%
+            filter(ano == input$year,
+                   estado == input$state) %>%
+            group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
+            summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+                      piezas=sum(no_piezas, na.rm = TRUE)) 
+        }
+      })
     
     
     
@@ -97,7 +111,7 @@ shinyServer(function(input, output) {
           }
       })
 
-    
+   
     
     # ----------- render functions -----------
     
@@ -112,13 +126,17 @@ shinyServer(function(input, output) {
             px$treemap(
               data_frame = data,
               path = c("estado","tipo_es","pais_origen_empresa","marca","calibre"),
-              values = "costo"),
-            py_plotly$graph_objects$Layout(title= "Composición de las armas distrbuidas",showlegend=TRUE)
+              values = "piezas",
+              color="costo",
+              color_continuous_scale="tropic",
+              color_continuous_midpoint=weighted.mean(data$costo,data$piezas)),
+      
+            py_plotly$graph_objects$Layout(title= "Composición de las armas distribuidas",showlegend=TRUE)
           ), output_type = "div")
       )
     })
     
-    
+
     output$barplot <- renderPlotly({
       
       BarOutputFunction() %>%
