@@ -5,3 +5,6 @@
 # session data files
 .RData
 .Rproj.user
+
+#virtual env
+env/

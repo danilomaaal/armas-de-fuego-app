@@ -16,6 +16,9 @@ library(plotly)
 # read data
 PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
 
+# theme
+shinythemes::shinytheme("sandstone")
+
 # user interface scheme
 shinyUI(
   fluidPage(
@@ -49,6 +52,8 @@ shinyUI(
         ),
         mainPanel(
           tabsetPanel(
+            tabPanel("General",
+                     uiOutput("treemap")),
             tabPanel("Costo",
                      plotlyOutput("barplot")),
             tabPanel("Tendencia",

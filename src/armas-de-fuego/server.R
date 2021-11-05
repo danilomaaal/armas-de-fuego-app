@@ -9,6 +9,14 @@
 # import packages
 library(shiny)
 
+library(reticulate)
+
+# python config and imports
+use_virtualenv(virtualenv = here::here("env/"), required = TRUE)
+px <- import("plotly.express")
+py_plotly <- import("plotly")
+
+
 
 # read data
 PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
@@ -47,6 +55,31 @@ shinyServer(function(input, output) {
         } 
       })
     
+    TreemapOutputFunction <- reactive({
+      
+      if (input$state=="Nacional") {
+        
+        PoliceFirearms %>%
+          filter(ano >= input$years[1],
+                 ano <= input$years[2]) %>%
+          mutate(estado="Nacional") %>%
+          group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
+          summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+                    piezas=sum(no_piezas, na.rm = TRUE))
+        
+      } else {
+        PoliceFirearms %>%
+          filter(ano >= input$years[1],
+                 ano <= input$years[2],
+                 estado == input$state) %>% 
+          group_by(estado, tipo_es, pais_origen_empresa,marca, calibre) %>%
+          summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+                    piezas=sum(no_piezas, na.rm = TRUE))
+      }
+    })
+    
+    
+    
     LineOutputFunction <- reactive({
       if(input$state!="Nacional"){
         PoliceFirearms %>%
@@ -67,6 +100,25 @@ shinyServer(function(input, output) {
     
     
     # ----------- render functions -----------
+    
+    output$treemap <- renderUI({
+      
+      data <- TreemapOutputFunction()
+      
+      HTML(
+        py_plotly$offline$plot(
+          
+          py_plotly$graph_objects$Figure(
+            px$treemap(
+              data_frame = data,
+              path = c("estado","tipo_es","pais_origen_empresa","marca","calibre"),
+              values = "costo"),
+            py_plotly$graph_objects$Layout(title= "Composición de las armas distrbuidas",showlegend=TRUE)
+          ), output_type = "div")
+      )
+    })
+    
+    
     output$barplot <- renderPlotly({
       
       BarOutputFunction() %>%
