@@ -93,6 +93,48 @@ shinyServer(function(input, output) {
       })
     
     
+    SankeyOutputFunction <- reactive({
+      if (input$state=="Nacional" & input$checkbox==TRUE) {
+        PoliceFirearms %>%
+          filter(!is.na(pais_origen_empresa),
+                 ano >= input$years[1],
+                 ano <= input$years[2]) %>%
+          group_by(pais_origen_empresa,estado) %>%
+          summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
+        
+      } else if(input$state!="Nacional" & input$checkbox==TRUE){
+        
+        PoliceFirearms %>%
+          filter(!is.na(pais_origen_empresa),
+                 ano >= input$years[1],
+                 ano <= input$years[2],
+                 estado==input$state) %>%
+          group_by(pais_origen_empresa,estado) %>%
+          summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
+      } else if (input$state=="Nacional" & input$checkbox==FALSE){
+        PoliceFirearms %>%
+          filter(!is.na(pais_origen_empresa),
+                 ano == input$year) %>%
+          group_by(pais_origen_empresa,estado) %>%
+          summarize(piezas=sum(no_piezas, na.rm = TRUE))  
+      } else {
+        PoliceFirearms %>%
+          filter(!is.na(pais_origen_empresa),
+                 ano == input$year,
+                 estado == input$state) %>%
+          group_by(pais_origen_empresa,estado) %>%
+          summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
+      }
+    })
+    
+    TransformSankeyData <- function(data_frame){
+        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
+        data_frame <- as.data.frame(sapply(data_frame, unclass))
+        names(data_frame) <- c("lab_cntry","lab_state","values","source","target")
+        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,4:5], as.numeric))
+        data_frame$target <- data_frame$target + max(data_frame$source)
+        return(data_frame)
+      }
     
     LineOutputFunction <- reactive({
       if(input$state!="Nacional"){
@@ -172,4 +214,29 @@ shinyServer(function(input, output) {
           autosize = TRUE)
     })
     
+    output$sankey <- renderPlotly({
+      data <- SankeyOutputFunction() 
+      data <- TransformSankeyData(data)
+        
+        
+        plot_ly(
+          type = "sankey",
+          orientation = "h",
+          node = list(
+            label = c("",unique(data$lab_cntry),unique(data$lab_state)),
+            color = viridis::inferno(length(unique(data$lab_cntry))),
+            pad = 15,
+            thickness = 20,
+            line = list(
+              color = "black",
+              width = 0.5
+            )
+          ),
+          link = list(
+            source = data$source,
+            target = data$target,
+            value = data$values
+          )
+        )
+        })
   })

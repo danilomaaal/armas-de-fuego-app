@@ -57,8 +57,9 @@ shinyUI(
             tabPanel("Costo",
                      plotlyOutput("barplot")),
             tabPanel("Tendencia",
-                     plotlyOutput("lineplot")
-            )
+                     plotlyOutput("lineplot")),
+            tabPanel("Flujo",
+                     plotlyOutput("sankey"))
           )
         )
       )
