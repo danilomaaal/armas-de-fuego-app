@@ -141,7 +141,7 @@ shinyServer(function(input, output) {
       
       BarOutputFunction() %>%
       plot_ly(x = ~cost, y = ~reorder(marca, cost), type = 'bar', orientation = 'h',
-              marker = list(color = '#3d405b',line = list(color = '#3d405b', width = 1.5))
+              marker = list(color = '#16A4A7',line = list(color = '#16A4A7', width = 1.5))
       ) %>%
         layout(title = glue::glue("Gasto en armas de fuego, { ifelse(input$checkbox==TRUE,
          paste(input$state,paste(input$years[1],input$years[2], sep='-'), sep=' '),
@@ -154,12 +154,12 @@ shinyServer(function(input, output) {
     output$lineplot <- renderPlotly({
       
       LineOutputFunction() %>%
-        plot_ly(x = ~ano, y = ~piezas, type = 'scatter', mode = 'lines+markers', color = I("#3d405b"),
+        plot_ly(x = ~ano, y = ~piezas, type = 'scatter', mode = 'lines+markers', color = I("#16A4A7"),
                 marker = list(
-                  color = "#3d405b",
+                  color = "#16A4A7",
                   size = 10,
                   line = list(
-                    color = "#3d405b",
+                    color = "#16A4A7",
                     width = 1
                   )
                 ),
