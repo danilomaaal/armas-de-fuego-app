@@ -96,33 +96,33 @@ shinyServer(function(input, output) {
     SankeyOutputFunction <- reactive({
       if (input$state=="Nacional" & input$checkbox==TRUE) {
         PoliceFirearms %>%
-          filter(!is.na(pais_origen_empresa),
+          filter(!is.na(marca),
                  ano >= input$years[1],
                  ano <= input$years[2]) %>%
-          group_by(pais_origen_empresa,estado) %>%
+          group_by(marca,estado) %>%
           summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
         
       } else if(input$state!="Nacional" & input$checkbox==TRUE){
         
         PoliceFirearms %>%
-          filter(!is.na(pais_origen_empresa),
+          filter(!is.na(marca),
                  ano >= input$years[1],
                  ano <= input$years[2],
                  estado==input$state) %>%
-          group_by(pais_origen_empresa,estado) %>%
+          group_by(marca,estado) %>%
           summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
       } else if (input$state=="Nacional" & input$checkbox==FALSE){
         PoliceFirearms %>%
-          filter(!is.na(pais_origen_empresa),
+          filter(!is.na(marca),
                  ano == input$year) %>%
-          group_by(pais_origen_empresa,estado) %>%
+          group_by(marca,estado) %>%
           summarize(piezas=sum(no_piezas, na.rm = TRUE))  
       } else {
         PoliceFirearms %>%
-          filter(!is.na(pais_origen_empresa),
+          filter(!is.na(marca),
                  ano == input$year,
                  estado == input$state) %>%
-          group_by(pais_origen_empresa,estado) %>%
+          group_by(marca,estado) %>%
           summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
       }
     })
