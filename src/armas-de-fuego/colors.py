@@ -1,4 +1,4 @@
-['aggrnyl', 'agsunset', 'algae', 'amp', 'armyrose', 'balance',
+color = ['aggrnyl', 'agsunset', 'algae', 'amp', 'armyrose', 'balance',
  'blackbody', 'bluered', 'blues', 'blugrn', 'bluyl', 'brbg',
  'brwnyl', 'bugn', 'bupu', 'burg', 'burgyl', 'cividis', 'curl',
  'darkmint', 'deep', 'delta', 'dense', 'earth', 'edge', 'electric',

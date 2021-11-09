@@ -10,6 +10,8 @@
 
 # import packages
 library(shiny)
+library(shinyWidgets)
+library(shinythemes)
 library(dplyr)
 library(plotly)
 
@@ -17,12 +19,24 @@ library(plotly)
 PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
 
 # theme
-shinythemes::shinytheme("sandstone")
+shinytheme("sandstone")
 
 # user interface scheme
 shinyUI(
   fluidPage(
-    titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales en México"),
+    tags$style(HTML("
+    .js-irs-0 .irs-bar,
+    .irs--shiny .irs-from,
+    .irs--shiny .irs-to,
+    .irs--shiny .irs-single,
+    .irs--shiny .irs-bar--single {
+    background-color:#280B54;
+    border-top:none;
+    border-bottom:none;
+}
+.nav-tabs > li > a {
+  color: #280B54;
+}")), titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales en México"),
     sidebarLayout(
       sidebarPanel(
         selectInput("state",
@@ -48,18 +62,23 @@ shinyUI(
                       value = 2006,
                       step = 1)
           ),
-        checkboxInput("checkbox",label="Periodo",value=TRUE)
+        prettyCheckbox("checkbox",
+                       label="Periodo",
+                       value=FALSE,
+                       shape = "curve",
+                       animation = "pulse")
         ),
         mainPanel(
           tabsetPanel(
-            tabPanel("General",
+            tabPanel("Flujo",
+                     plotlyOutput("sankey",height = "auto")),
+            tabPanel("Desglose",
                      uiOutput("treemap")),
             tabPanel("Costo",
                      plotlyOutput("barplot")),
             tabPanel("Tendencia",
-                     plotlyOutput("lineplot")),
-            tabPanel("Flujo",
-                     plotlyOutput("sankey"))
+                     plotlyOutput("lineplot"))
+            
           )
         )
       )

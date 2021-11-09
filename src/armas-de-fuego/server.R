@@ -16,11 +16,8 @@ use_virtualenv(virtualenv = here::here("env/"), required = TRUE)
 px <- import("plotly.express")
 py_plotly <- import("plotly")
 
-
-
 # read data
 PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
-
 
 # server logic to process data
 shinyServer(function(input, output) {
@@ -127,15 +124,6 @@ shinyServer(function(input, output) {
       }
     })
     
-    TransformSankeyData <- function(data_frame){
-        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
-        data_frame <- as.data.frame(sapply(data_frame, unclass))
-        names(data_frame) <- c("lab_cntry","lab_state","values","source","target")
-        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,4:5], as.numeric))
-        data_frame$target <- data_frame$target + max(data_frame$source)
-        return(data_frame)
-      }
-    
     LineOutputFunction <- reactive({
       if(input$state!="Nacional"){
         PoliceFirearms %>%
@@ -153,6 +141,24 @@ shinyServer(function(input, output) {
           }
       })
 
+    # ----------- regular functions -----------
+    TransformSankeyData <- function(data_frame){
+      data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
+      data_frame <- as.data.frame(lapply(data_frame, unclass))
+      names(data_frame) <- c("lab_cntry","lab_state","values","source","target")
+      data_frame[,4:5] <- as.data.frame(lapply(data_frame[,4:5], as.numeric))
+      data_frame$target <- data_frame$target + max(data_frame$source)
+      return(data_frame)
+    }
+    
+    SetTitles <- function(tema){
+      glue::glue(
+      "{ paste0(tema,
+      ifelse(input$checkbox==TRUE,
+      paste(input$state,paste(input$years[1],input$years[2], sep='-'), sep=' '),
+         paste(input$state, input$year, sep=' ') )) 
+                 }")
+    }
    
     
     # ----------- render functions -----------
@@ -170,12 +176,11 @@ shinyServer(function(input, output) {
               path = c("estado","tipo_es","pais_origen_empresa","marca","calibre"),
               values = "piezas",
               color="costo",
-              color_continuous_scale="tropic",
-              color_continuous_midpoint=weighted.mean(data$costo,data$piezas)),
-      
-            py_plotly$graph_objects$Layout(title= "Composición de las armas distribuidas",showlegend=TRUE)
-          ), output_type = "div")
-      )
+              color_continuous_scale="viridis",
+              color_continuous_midpoint=weighted.mean(data$costo,data$piezas))
+            ),
+          output_type = "div")
+      ) 
     })
     
 
@@ -183,11 +188,9 @@ shinyServer(function(input, output) {
       
       BarOutputFunction() %>%
       plot_ly(x = ~cost, y = ~reorder(marca, cost), type = 'bar', orientation = 'h',
-              marker = list(color = '#16A4A7',line = list(color = '#16A4A7', width = 1.5))
+              marker = list(color = '#F8BF2B',line = list(color = '#F8BF2B', width = 1.5))
       ) %>%
-        layout(title = glue::glue("Gasto en armas de fuego, { ifelse(input$checkbox==TRUE,
-         paste(input$state,paste(input$years[1],input$years[2], sep='-'), sep=' '),
-         paste(input$state, input$year, sep=' ') ) }"),
+        layout(title = SetTitles("Gasto en armas de fuego: "),
                barmode = 'group',
                xaxis = list(title = "Dólares constantes de 2019"),
                yaxis = list(title = ""))
@@ -196,12 +199,12 @@ shinyServer(function(input, output) {
     output$lineplot <- renderPlotly({
       
       LineOutputFunction() %>%
-        plot_ly(x = ~ano, y = ~piezas, type = 'scatter', mode = 'lines+markers', color = I("#16A4A7"),
+        plot_ly(x = ~ano, y = ~piezas, type = 'scatter', mode = 'lines+markers', color = I("#F8BF2B"),
                 marker = list(
-                  color = "#16A4A7",
+                  color = "#F8BF2B",
                   size = 10,
                   line = list(
-                    color = "#16A4A7",
+                    color = "#F8BF2B",
                     width = 1
                   )
                 ),
@@ -224,7 +227,7 @@ shinyServer(function(input, output) {
           orientation = "h",
           node = list(
             label = c("",unique(data$lab_cntry),unique(data$lab_state)),
-            color = viridis::inferno(length(unique(data$lab_cntry))),
+            color = viridis::viridis(length(unique(data$lab_cntry)),alpha = 0.8),
             pad = 15,
             thickness = 20,
             line = list(
@@ -237,6 +240,8 @@ shinyServer(function(input, output) {
             target = data$target,
             value = data$values
           )
-        )
-        })
+        ) %>%
+          layout(title = SetTitles("Flujo legal de armas de fuego: ") )
+    
+      })
   })
