@@ -8,6 +8,7 @@
   
 # paquetes
 require(dplyr)
+require(tidyr)
 require(magrittr)
 require(stringr)
 require(priceR)
@@ -82,6 +83,7 @@ facturas %<>%
 	                                "NA"=NA_character_,
 	                                "subsria. de seg. publica y readaptacion social"="Subsecretaria de Seguridad Publica y Readaptacion Social",
 	                                "Policias municipales"="Policía Municipal"),
+	       vendido_a_cliente=replace_na(vendido_a_cliente,"No especificado"),
 	       marca=ifelse(marca=="n.a.",NA_character_,marca),
 	       pais_origen_empresa=ifelse(pais_origen_empresa=="n.a.",NA_character_,
 	                                  ifelse(pais_origen_empresa=="Estado Unidos","Estados Unidos",pais_origen_empresa))

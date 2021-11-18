@@ -66,7 +66,8 @@ shinyUI(
                        label="Periodo",
                        value=FALSE,
                        shape = "curve",
-                       animation = "pulse")
+                       animation = "pulse"),
+        textOutput("textdata")
         ),
         mainPanel(
           tabsetPanel(

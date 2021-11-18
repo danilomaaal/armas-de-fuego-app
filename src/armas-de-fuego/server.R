@@ -8,11 +8,13 @@
 
 # import packages
 library(shiny)
-
 library(reticulate)
 
-# python config and imports
+
+# local python config and imports
 use_virtualenv(virtualenv = here::here("env/"), required = TRUE)
+
+# python imports
 px <- import("plotly.express")
 py_plotly <- import("plotly")
 
@@ -22,8 +24,19 @@ PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.
 # server logic to process data
 shinyServer(function(input, output) {
 
+  
     # ----------- reactive functions -----------
-   
+  # text functions
+  output$textdata <- renderText({
+    paste0("Datos seleccionados a nivel ", input$state, " para el",
+           
+            ifelse(input$checkbox==TRUE,
+                  paste0(" periodo ",paste(input$years[1],input$years[2], sep='-')),
+                  paste0(" año ",input$year) ) 
+                  ) 
+    })
+  
+  # plot functions
     BarOutputFunction <- reactive({
       if(input$state!="Nacional" & input$checkbox==TRUE){
         PoliceFirearms %>%
@@ -91,6 +104,7 @@ shinyServer(function(input, output) {
     
     
     SankeyOutputFunction <- reactive({
+      
       if (input$state=="Nacional" & input$checkbox==TRUE) {
         PoliceFirearms %>%
           filter(!is.na(marca),
@@ -106,7 +120,7 @@ shinyServer(function(input, output) {
                  ano >= input$years[1],
                  ano <= input$years[2],
                  estado==input$state) %>%
-          group_by(marca,estado) %>%
+          group_by(marca,vendido_a_cliente) %>%
           summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
       } else if (input$state=="Nacional" & input$checkbox==FALSE){
         PoliceFirearms %>%
@@ -119,7 +133,7 @@ shinyServer(function(input, output) {
           filter(!is.na(marca),
                  ano == input$year,
                  estado == input$state) %>%
-          group_by(marca,estado) %>%
+          group_by(marca,vendido_a_cliente) %>%
           summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
       }
     })
