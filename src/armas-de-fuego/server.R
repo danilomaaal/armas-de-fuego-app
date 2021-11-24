@@ -42,7 +42,7 @@ shinyServer(function(input, output) {
       como muestran las discrepancias existentes con solicitudes previas de información. 
     </ol>
     Aunque este ejercicio busca dar una idea de la distribución de armas de fuego, 
-    las consideraciones anteriores obligan a tomar con cierta reserva las cifras que se muestran en las visualizaciones."),
+    las consideraciones anteriores obligan a tomar con cierta reserva las cifras que se muestran en estas visualizaciones."),
                 footer=modalButton("Entendido")))
   
     # ----------- reactive functions -----------
@@ -51,7 +51,7 @@ shinyServer(function(input, output) {
     paste0("Datos seleccionados a nivel ", input$state, " para el",
            
             ifelse(input$checkbox==TRUE,
-                  paste0(" periodo ",paste(input$years[1],input$years[2], sep='-')),
+                  paste0(" periodo ",paste(input$years[1],input$years[2], sep="-")),
                   paste0(" año ",input$year) ) 
                   ) 
     })
@@ -222,11 +222,11 @@ shinyServer(function(input, output) {
     output$barplot <- renderPlotly({
       
       BarOutputFunction() %>%
-      plot_ly(x = ~cost, y = ~reorder(marca, cost), type = 'bar', orientation = 'h',
-              marker = list(color = '#F8BF2B',line = list(color = '#F8BF2B', width = 1.5))
+      plot_ly(x = ~cost, y = ~reorder(marca, cost), type = "bar", orientation = "h",
+              marker = list(color = "#F8BF2B",line = list(color = "#F8BF2B", width = 1.5))
       ) %>%
         layout(title = SetTitles("Gasto en armas de fuego: "),
-               barmode = 'group',
+               barmode = "group",
                xaxis = list(title = "Dólares constantes de 2019"),
                yaxis = list(title = ""))
     })
@@ -234,7 +234,7 @@ shinyServer(function(input, output) {
     output$lineplot <- renderPlotly({
       
       LineOutputFunction() %>%
-        plot_ly(x = ~ano, y = ~piezas, type = 'scatter', mode = 'lines+markers', color = I("#F8BF2B"),
+        plot_ly(x = ~ano, y = ~piezas, type = "scatter", mode = "lines+markers", color = I("#F8BF2B"),
                 marker = list(
                   color = "#F8BF2B",
                   size = 10,
