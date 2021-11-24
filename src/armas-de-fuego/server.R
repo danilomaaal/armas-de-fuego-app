@@ -9,7 +9,7 @@
 # import packages
 library(shiny)
 library(reticulate)
-
+library(tidyr)
 
 # local python config and imports
 use_virtualenv(virtualenv = here::here("env/"), required = TRUE)
@@ -20,6 +20,7 @@ py_plotly <- import("plotly")
 
 # read data
 PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
+ComparedData <- read.csv(here::here("data/processed","merged_data.csv"), stringsAsFactors = FALSE)
 
 # server logic to process data
 shinyServer(function(input, output) {
@@ -38,7 +39,7 @@ shinyServer(function(input, output) {
     <ol>
       <li>El universo aquí mostrado se refiere únicamente a armas comercializadas por la SEDENA a los gobiernos/autoridades estatales</li>
       <li> Estos datos cuentan con un subregistro. Es decir, no dan cuenta de la totalidad de las transferencias de armas,
-      como muestran las discrepancias existentes con solicitudes previas de información (ver pestaña <i>comparativa</i>). </li> 
+      como muestran las discrepancias existentes con solicitudes previas de información. 
     </ol>
     Aunque este ejercicio busca dar una idea de la distribución de armas de fuego, 
     las consideraciones anteriores obligan a tomar con cierta reserva las cifras que se muestran en las visualizaciones."),
@@ -55,7 +56,7 @@ shinyServer(function(input, output) {
                   ) 
     })
   
-  # plot functions
+  # plot filter functions
     BarOutputFunction <- reactive({
       if(input$state!="Nacional" & input$checkbox==TRUE){
         PoliceFirearms %>%
@@ -173,6 +174,7 @@ shinyServer(function(input, output) {
             summarize(piezas=sum(no_piezas, na.rm = TRUE))
           }
       })
+    
 
     # ----------- regular functions -----------
     TransformSankeyData <- function(data_frame){
@@ -277,4 +279,5 @@ shinyServer(function(input, output) {
           layout(title = SetTitles("Flujo legal de armas de fuego: ") )
     
       })
+    
   })
