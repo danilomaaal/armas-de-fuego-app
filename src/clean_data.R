@@ -100,12 +100,12 @@ facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "olicia", 
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "ublica", "ública")
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "ecretaria", "ecretaría")
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "ecretaríado","ecretariado")
-
 # fix typos
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "_Policías municipales", " y Policía Municipal")
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "Procuradoría|Procuradoria|Procuraduria", "Procuraduría")
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "Jusiticia", "Justicia")
-
+facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "Cuidadana","Ciudadana")
+facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "Cuidadania","Ciudadana")
 # set filter
 armas_fuego <- c("Ametralladoras", "Carabinas","Escopetas", "Rifles", 
                  "Pistolas", "Pistolas ametralladoras","Revólveres", "Subametralladoras")
