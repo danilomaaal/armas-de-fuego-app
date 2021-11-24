@@ -24,6 +24,7 @@ shinytheme("sandstone")
 # user interface scheme
 shinyUI(
   fluidPage(
+    # this tag will override default shiny blue color in select inputs and tabs to a nicer purple
     tags$style(HTML("
     .js-irs-0 .irs-bar,
     .irs--shiny .irs-from,

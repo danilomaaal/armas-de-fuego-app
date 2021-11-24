@@ -9,8 +9,6 @@ then
   printf "Donwloading data...\n"
 
   wget "https://stopusarmstomexico.org/wp-content/uploads/2020/12/Armas_Policias_Mexico.xlsx"
-  
-  wget "https://stopusarmstomexico.org/wp-content/uploads/2020/12/Certificados_usuarios_finales.xlsx"
 
   printf "OK!...\n"
 

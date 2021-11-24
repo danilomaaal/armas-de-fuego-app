@@ -177,7 +177,8 @@ shinyServer(function(input, output) {
     
 
     # ----------- regular functions -----------
-    TransformSankeyData <- function(data_frame){
+
+      TransformSankeyData <- function(data_frame){
       data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
       data_frame <- as.data.frame(lapply(data_frame, unclass))
       names(data_frame) <- c("lab_cntry","lab_state","values","source","target")
