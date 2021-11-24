@@ -23,7 +23,26 @@ PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.
 
 # server logic to process data
 shinyServer(function(input, output) {
-
+ # warning sign
+  showModal(
+    modalDialog(title="Advertencia",
+                HTML("
+    Los datos aquí presentados fueron generados por <i> Stop US Arms to Mexico y la Comisión Mexicana para la Defensa y Promoción de los Derechos Humanos </i> 
+    a partir de la revisión de facturas de transferencias de armas de fuego y municiones de la Secretaría de la Defensa Nacional (SEDENA)
+    a las autoridades estatales durante el periodo 2006-2018. Se trata de documentación obtenida a través de la solicitud de información <b>#0000700176018</b>.
+    La base de datos y la metodología se encuentra disponible para descarga <a href='www.stopusarmstomexico/police-firearms-database'> aquí.</a>
+    <br>
+    En México la SEDENA es la única autoridad facultada para distribuir armamento de forma legal a empresas de seguridad, particulares,
+    dependencias federales y estatales. En este sentido cabe puntulizar dos cosas:
+    <br>
+    <ol>
+      <li>El universo aquí mostrado se refiere únicamente a armas comercializadas por la SEDENA a los gobiernos/autoridades estatales</li>
+      <li> Estos datos cuentan con un subregistro. Es decir, no dan cuenta de la totalidad de las transferencias de armas,
+      como muestran las discrepancias existentes con solicitudes previas de información (ver pestaña <i>comparativa</i>). </li> 
+    </ol>
+    Aunque este ejercicio busca dar una idea de la distribución de armas de fuego, 
+    las consideraciones anteriores obligan a tomar con cierta reserva las cifras que se muestran en las visualizaciones."),
+                footer=modalButton("Entendido")))
   
     # ----------- reactive functions -----------
   # text functions
