@@ -20,7 +20,6 @@ py_plotly <- import("plotly")
 
 # read data
 PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
-ComparedData <- read.csv(here::here("data/processed","merged_data.csv"), stringsAsFactors = FALSE)
 
 # server logic to process data
 shinyServer(function(input, output) {
@@ -48,12 +47,22 @@ shinyServer(function(input, output) {
     # ----------- reactive functions -----------
   # text functions
   output$textdata <- renderText({
-    paste0("Datos seleccionados a nivel ", input$state, " para el",
-           
-            ifelse(input$checkbox==TRUE,
-                  paste0(" periodo ",paste(input$years[1],input$years[2], sep="-")),
-                  paste0(" año ",input$year) ) 
-                  ) 
+    
+    
+    if(input$checkbox==FALSE){
+      # check for available data
+      available  <- SankeyOutputFunction() %>%
+        nrow()
+  
+        if(available == 0) {
+          paste0("Sin datos para ", input$state, " en el año ",input$year)
+        }else{
+          paste0("Datos a nivel ", input$state, " para el año ",input$year,".")
+        }
+             
+      } else{
+        paste0("Datos a nivel ", input$state," para el periodo ",paste(input$years[1],input$years[2], sep="-"),".")
+        }
     })
   
   # plot filter functions

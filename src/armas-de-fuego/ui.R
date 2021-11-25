@@ -68,17 +68,24 @@ shinyUI(
                        value=FALSE,
                        shape = "curve",
                        animation = "pulse"),
-        textOutput("textdata")
+        helpText("Elige los filtros para mostrar datos a nivel nacional o estatal durante un periodo determinado o para un año en particular.
+                 Selección actual:"),
+        textOutput("textdata"),
+        br(),
+        helpText("TODO: ADD DESCRIPTION")
         ),
         mainPanel(
           tabsetPanel(
             tabPanel("Flujo",
+                     br(),
                      plotlyOutput("sankey",height = "auto")),
             tabPanel("Desglose",
                      uiOutput("treemap")),
             tabPanel("Costo",
+                     br(),
                      plotlyOutput("barplot")),
             tabPanel("Tendencia",
+                     br(),
                      plotlyOutput("lineplot"))
             
           )
