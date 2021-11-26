@@ -72,7 +72,23 @@ shinyUI(
                  Selección actual:"),
         textOutput("textdata"),
         br(),
-        helpText("TODO: ADD DESCRIPTION")
+        helpText(
+        HTML("
+        En febrero de 2019 un tribunal local en Stuttgart, Alemania, condenó a dos empleados de la empresa de armas
+        Heckler & Koch (H&K) por haber exportado rifles de asalto G36 a México entre 2006 y 2009, usando documentación falsa.
+        Esta acción buscaba eludir la prohibición del gobierno alemán de exportar armas de fuego a zonas donde
+        las autoridades locales cometieran violaciones de derechos humanos. En el caso de México,
+        esta prohibición se encontraba vigente para los estados de Chiapas, Chihuahua, Guerrero y Jalisco.<br>
+        <br>
+        Esta omisión ocurrió exclusivamente del lado alemán, de acuerdo con las declaraciones de testigos,
+        el personal de H&K sugirió a la SEDENA que en la documentación evitara mencionar a estos estados
+        o que los substituyera con los nombres de otros. Estas omisiones salieron a la luz debido a que
+        algunos de estos rifles terminaron en manos de los policías municipales de Iguala, Guerrero, que participaron
+        en el ataque a los normalistas de Ayotzinapa el 26 de septiembre de 2014.<br>
+        <br>
+        Si bien el tráfico ilegal de armas de fuego es un grave problema en México, es importante también mejorar/transparentar
+        los mecanismos legales de distribución de armas que concentra la SEDENA.
+                 "))
         ),
         mainPanel(
           tabsetPanel(

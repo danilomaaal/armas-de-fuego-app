@@ -197,8 +197,7 @@ shinyServer(function(input, output) {
     }
     
     SetTitles <- function(tema){
-      glue::glue(
-      "{ paste0(tema,
+      glue::glue("{ paste0(tema,
       ifelse(input$checkbox==TRUE,
       paste(input$state,paste(input$years[1],input$years[2], sep='-'), sep=' '),
          paste(input$state, input$year, sep=' ') )) 
@@ -255,7 +254,7 @@ shinyServer(function(input, output) {
                 ),
                 showlegend = FALSE) %>%
         layout(
-          title = glue::glue("Número de armas de fuego distribuidas, {input$state} 2006-2018"),
+          title = glue::glue("Número de armas de fuego distribuidas: {input$state} 2006-2018"),
           xaxis = list(title = "Año"),
           yaxis = list(title = "Total"),
           margin = list(l = 65),
