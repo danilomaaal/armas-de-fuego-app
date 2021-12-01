@@ -175,13 +175,15 @@ shinyServer(function(input, output) {
              ano <= input$years[2],
              estado == input$state) %>%
           group_by(ano) %>%
-          summarize(piezas=sum(no_piezas, na.rm = TRUE))
+          summarize(costo=sum(en_dolares_2019, na.rm = TRUE),
+                    piezas=sum(no_piezas, na.rm = TRUE))
         } else {
           PoliceFirearms %>%
             filter(ano >= input$years[1],
                    ano <= input$years[2]) %>%
             group_by(ano) %>%
-            summarize(piezas=sum(no_piezas, na.rm = TRUE))
+            summarize(costo=sum(en_dolares_2019, na.rm = TRUE),
+                      piezas=sum(no_piezas, na.rm = TRUE))
           }
       })
     
@@ -255,8 +257,25 @@ shinyServer(function(input, output) {
     
     output$lineplot <- renderPlotly({
       
-      LineOutputFunction() %>%
-        plot_ly(x = ~ano, y = ~piezas, type = "scatter", mode = "lines+markers", color = I("#F8BF2B"),
+     costos <- LineOutputFunction() %>%
+        plot_ly(x = ~ano, y = ~costo, name = "Costo", type = "scatter", mode = "lines+markers", color = I("#280B54"),
+                marker = list(
+                  color = "#280B54",
+                  size = 10,
+                  line = list(
+                    color = "#280B54",
+                    width = 1
+                  )
+                ),
+                showlegend = TRUE) %>%
+        layout(
+          title = glue::glue("Gasto y total de armas de fuego distribuidas: {input$state} 2006-2018"),
+          yaxis = list(title = "Dólares constantes de 2019"),
+          margin = list(l = 65),
+          autosize = TRUE)
+      
+      total <- LineOutputFunction() %>%
+        plot_ly(x = ~ano, y = ~piezas, name = "Piezas", type = "scatter",mode = "lines+markers",color = I("#F8BF2B"),
                 marker = list(
                   color = "#F8BF2B",
                   size = 10,
@@ -265,13 +284,14 @@ shinyServer(function(input, output) {
                     width = 1
                   )
                 ),
-                showlegend = FALSE) %>%
+                showlegend = TRUE) %>%
         layout(
-          title = glue::glue("Número de armas de fuego distribuidas: {input$state} 2006-2018"),
-          xaxis = list(title = "Año"),
-          yaxis = list(title = "Total"),
+          yaxis = list(title = "Total de armas"),
           margin = list(l = 65),
           autosize = TRUE)
+      
+      subplot(costos,total,nrows = 2, shareX = FALSE, shareY = FALSE, titleY=TRUE)
+      
     })
     
     output$sankey <- renderPlotly({
