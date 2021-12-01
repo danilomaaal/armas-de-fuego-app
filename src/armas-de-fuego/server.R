@@ -25,12 +25,12 @@ PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.
 shinyServer(function(input, output) {
  # warning sign
   showModal(
-    modalDialog(title="Advertencia",
+    modalDialog(title="Importante",
                 HTML("
-    Los datos aquí presentados fueron generados por <i> Stop US Arms to Mexico y la Comisión Mexicana para la Defensa y Promoción de los Derechos Humanos </i> 
+                Los datos aquí presentados fueron generados por <i> Stop US Arms to Mexico y la Comisión Mexicana para la Defensa y Promoción de los Derechos Humanos </i> 
     a partir de la revisión de facturas de transferencias de armas de fuego y municiones de la Secretaría de la Defensa Nacional (SEDENA)
     a las autoridades estatales durante el periodo 2006-2018. Se trata de documentación obtenida a través de la solicitud de información <b>#0000700176018</b>.
-    La base de datos y la metodología se encuentra disponible para descarga <a href='www.stopusarmstomexico/police-firearms-database'> aquí.</a>
+    Tanto la base de datos como la metodología se encuentran disponibles para descarga <a href='https://www.stopusarmstomexico.org/police-firearms-database'> aquí.</a>
     <br>
     En México la SEDENA es la única autoridad facultada para distribuir armamento de forma legal a empresas de seguridad, particulares,
     dependencias federales y estatales. En este sentido cabe puntulizar dos cosas:
@@ -41,7 +41,8 @@ shinyServer(function(input, output) {
       como muestran las discrepancias existentes con solicitudes previas de información. 
     </ol>
     Aunque este ejercicio busca dar una idea de la distribución de armas de fuego, 
-    las consideraciones anteriores obligan a tomar con cierta reserva las cifras que se muestran en estas visualizaciones."),
+    las consideraciones anteriores obligan a <b> tomar con reserva las cifras que se muestran en estas visualizaciones</b>.
+                     "),
                 footer=modalButton("Entendido")))
   
     # ----------- reactive functions -----------
@@ -55,7 +56,7 @@ shinyServer(function(input, output) {
         nrow()
   
         if(available == 0) {
-          paste0("Sin datos para ", input$state, " en el año ",input$year)
+          paste0("Sin datos para ", input$state, " en ",input$year)
         }else{
           paste0("Datos a nivel ", input$state, " para el año ",input$year,".")
         }
@@ -188,12 +189,24 @@ shinyServer(function(input, output) {
     # ----------- regular functions -----------
 
       TransformSankeyData <- function(data_frame){
-      data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
-      data_frame <- as.data.frame(lapply(data_frame, unclass))
-      names(data_frame) <- c("lab_cntry","lab_state","values","source","target")
-      data_frame[,4:5] <- as.data.frame(lapply(data_frame[,4:5], as.numeric))
-      data_frame$target <- data_frame$target + max(data_frame$source)
-      return(data_frame)
+        
+        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
+        data_frame <- as.data.frame(lapply(data_frame, unclass))
+        names(data_frame) <- c("lab_making","lab_state","values","source","target")
+        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,4:5], as.numeric))
+        data_frame$target <- data_frame$target + max(data_frame$source)
+        
+        makings <- data_frame %>%
+          dplyr::arrange(source) %>%
+          pull(lab_making)
+        
+        state <- data_frame %>%
+          dplyr::arrange(target) %>%
+          pull(lab_state)
+        
+        transformedData <- list(data_frame,makings,state)
+        
+        return(transformedData)
     }
     
     SetTitles <- function(tema){
@@ -262,7 +275,9 @@ shinyServer(function(input, output) {
     })
     
     output$sankey <- renderPlotly({
+      
       data <- SankeyOutputFunction() 
+      
       data <- TransformSankeyData(data)
         
         
@@ -270,8 +285,10 @@ shinyServer(function(input, output) {
           type = "sankey",
           orientation = "h",
           node = list(
-            label = c("",unique(data$lab_cntry),unique(data$lab_state)),
-            color = viridis::viridis(length(unique(data$lab_cntry)),alpha = 0.8),
+            label = c("",
+                      unique(data[[2]]),
+                      unique(data[[3]])),
+            color = viridis::viridis(75,alpha = 0.8),
             pad = 15,
             thickness = 20,
             line = list(
@@ -280,9 +297,9 @@ shinyServer(function(input, output) {
             )
           ),
           link = list(
-            source = data$source,
-            target = data$target,
-            value = data$values
+            source = data[[1]][["source"]],
+            target = data[[1]][["target"]],
+            value = data[[1]][["values"]]
           )
         ) %>%
           layout(title = SetTitles("Flujo legal de armas de fuego: ") )
