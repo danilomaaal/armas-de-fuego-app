@@ -14,7 +14,7 @@ me@compu:~$  git clone git@github.com:ildanilo/armas-de-fuego-app.git
 
 me@compu:~$ cd armas-de-fuego-app/
 
-me@compu:~$ Rscript src/clean_data.R 
+me@compu:~$ Rscript utils/clean_data.R 
 
 ```
 ## Configurar un ambiente Python para habilitar R reticulate 
