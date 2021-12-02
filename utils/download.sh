@@ -2,6 +2,8 @@
 
 # this script downloads data on mexican police firearms, be sure to execute it from Rscript
 
+mkdir -p data/{raw,processed}
+
 if cd data/raw
 
 then

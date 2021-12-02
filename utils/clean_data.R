@@ -14,7 +14,7 @@ require(stringr)
 require(priceR)
 
 #import data from stop us arms
-#system("src/download.sh")
+system("src/download.sh")
 
 # read data
 facturas <- readxl::read_excel(paste(here::here("data/raw"),
@@ -85,8 +85,10 @@ facturas %<>%
 	                                "Policias municipales"="Policía Municipal"),
 	       vendido_a_cliente=replace_na(vendido_a_cliente,"No especificado"),
 	       marca=ifelse(marca=="n.a.",NA_character_,marca),
-	       pais_origen_empresa=ifelse(pais_origen_empresa=="n.a.",NA_character_,
-	                                  ifelse(pais_origen_empresa=="Estado Unidos","Estados Unidos",pais_origen_empresa))
+	       pais_origen_empresa=ifelse(pais_origen_empresa=="n.a.","Sin dato",
+	                                  ifelse(pais_origen_empresa=="Estado Unidos","Estados Unidos",pais_origen_empresa)),
+	       calibre=ifelse(calibre=="NA","Sin dato",calibre),
+	       pais_origen_empresa=replace_na(pais_origen_empresa,"Sin dato"),
 	       )
 
 
@@ -164,5 +166,4 @@ facturas %<>%
 
 # export data in csv file
 write.csv(facturas, paste(here::here("data/processed"), "compras_armas_final_web.csv", sep="/"), fileEncoding = "UTF-8", row.names = FALSE)
-write.csv(facturas, paste(here::here("data/processed"), "exchange_dollar_rate.csv", sep="/"), fileEncoding = "UTF-8", row.names = FALSE)
 #end.
