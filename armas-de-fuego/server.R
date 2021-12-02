@@ -12,6 +12,7 @@ library(reticulate)
 library(tidyr)
 
 # python venv config needed to deploy in shinyapps.io
+# also check .Rprofile
 VenvDir = Sys.getenv('VENV_')
 PythonPath = Sys.getenv('PYTHON_PATH_')
 virtualenv_create(envname = VenvDir, python = PythonPath)
