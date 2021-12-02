@@ -38,7 +38,7 @@ shinyServer(function(input, output) {
     <ol>
       <li>El universo aquí mostrado se refiere únicamente a armas comercializadas por la SEDENA a los gobiernos/autoridades estatales</li>
       <li> Estos datos cuentan con un subregistro. Es decir, no dan cuenta de la totalidad de las transferencias de armas,
-      como muestran las discrepancias existentes con solicitudes previas de información. 
+      como muestran las discrepancias existentes con solicitudes previas de información.
     </ol>
     Aunque este ejercicio busca dar una idea de la distribución de armas de fuego, 
     las consideraciones anteriores obligan a <b> tomar con reserva las cifras que se muestran en estas visualizaciones</b>.
@@ -190,6 +190,8 @@ shinyServer(function(input, output) {
 
     # ----------- regular functions -----------
 
+    # sankey plot uses numbers to represent nodes,
+    # this funtion transforms labels 
       TransformSankeyData <- function(data_frame){
         
         data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
@@ -219,26 +221,42 @@ shinyServer(function(input, output) {
                  }")
     }
    
+    # get carto-color palette from python
+    pycolors <- px$colors$carto$Tropic_r
+    # remove rgb()
+    pycolors <- gsub("[r|g|b]|[(|)]","",pycolors)
+    pycolors <- gsub(", ","-",pycolors)
+    # run R´s rgb function for each color  
+    # thanks to :https://stackoverflow.com/questions/31574480/rgb-to-hex-converter?noredirect=1&lq=1
+    pycolors <- sapply(strsplit(pycolors, "-"),
+                       function(pycolors){
+                         rgb(pycolors[1], pycolors[2], pycolors[3], maxColorValue=255)
+                       }
+    )
+    # genereta palette
+    pypalette <- grDevices::colorRampPalette(c(pycolors[1], pycolors[7]))
     
     # ----------- render functions -----------
     
-    output$treemap <- renderUI({
+    
+     output$treemap <- renderUI({
       
       data <- TreemapOutputFunction()
       
       HTML(
         py_plotly$offline$plot(
-          
           py_plotly$graph_objects$Figure(
             px$treemap(
               data_frame = data,
               path = c("estado","tipo_es","pais_origen_empresa","marca","calibre"),
               values = "piezas",
               color="costo",
-              color_continuous_scale="viridis",
-              color_continuous_midpoint=weighted.mean(data$costo,data$piezas))
-            ),
-          output_type = "div")
+              color_continuous_scale=pycolors,
+              color_continuous_midpoint=weighted.mean(data$costo,data$piezas)
+            )
+          )$update_layout(title_text = SetTitles("Detalle del flujo: ")),
+          output_type = "div"
+          )
       ) 
     })
     
@@ -247,7 +265,7 @@ shinyServer(function(input, output) {
       
       BarOutputFunction() %>%
       plot_ly(x = ~cost, y = ~reorder(marca, cost), type = "bar", orientation = "h",
-              marker = list(color = "#F8BF2B",line = list(color = "#F8BF2B", width = 1.5))
+              marker = list(color = pycolors[3],line = list(color = pycolors[3], width = 1.5))
       ) %>%
         layout(title = SetTitles("Gasto en armas de fuego: "),
                barmode = "group",
@@ -258,12 +276,12 @@ shinyServer(function(input, output) {
     output$lineplot <- renderPlotly({
       
      costos <- LineOutputFunction() %>%
-        plot_ly(x = ~ano, y = ~costo, name = "Costo", type = "scatter", mode = "lines+markers", color = I("#280B54"),
+        plot_ly(x = ~ano, y = ~costo, name = "Costo", type = "scatter", mode = "lines+markers", color = I(pycolors[1]),
                 marker = list(
-                  color = "#280B54",
+                  color = pycolors[1],
                   size = 10,
                   line = list(
-                    color = "#280B54",
+                    color = pycolors[1],
                     width = 1
                   )
                 ),
@@ -275,12 +293,12 @@ shinyServer(function(input, output) {
           autosize = TRUE)
       
       total <- LineOutputFunction() %>%
-        plot_ly(x = ~ano, y = ~piezas, name = "Piezas", type = "scatter",mode = "lines+markers",color = I("#F8BF2B"),
+        plot_ly(x = ~ano, y = ~piezas, name = "Piezas", type = "scatter",mode = "lines+markers",color = I(pycolors[7]),
                 marker = list(
-                  color = "#F8BF2B",
+                  color = pycolors[7],
                   size = 10,
                   line = list(
-                    color = "#F8BF2B",
+                    color = pycolors[7],
                     width = 1
                   )
                 ),
@@ -308,7 +326,7 @@ shinyServer(function(input, output) {
             label = c("",
                       unique(data[[2]]),
                       unique(data[[3]])),
-            color = viridis::viridis(75,alpha = 0.8),
+            color = pypalette(70),
             pad = 15,
             thickness = 20,
             line = list(
