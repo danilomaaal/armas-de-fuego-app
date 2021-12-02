@@ -14,11 +14,10 @@ require(stringr)
 require(priceR)
 
 #import data from stop us arms
-system("src/download.sh")
+system("utils/download.sh")
 
 # read data
-facturas <- readxl::read_excel(paste(here::here("data/raw"),
-                           "Armas_Policias_Mexico.xlsx",sep = "/"))
+facturas <- readxl::read_excel(here::here("data/raw","Armas_Policias_Mexico.xlsx"))
 
 # clean names and translate vars
 facturas %<>%
@@ -165,5 +164,6 @@ facturas %<>%
 	)
 
 # export data in csv file
-write.csv(facturas, paste(here::here("data/processed"), "compras_armas_final_web.csv", sep="/"), fileEncoding = "UTF-8", row.names = FALSE)
+write.csv(facturas,here::here("armas-de-fuego","compras_armas_final_web.csv"),
+          fileEncoding = "UTF-8", row.names = FALSE)
 #end.

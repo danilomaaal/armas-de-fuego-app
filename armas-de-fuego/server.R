@@ -19,7 +19,7 @@ virtualenv_install(VenvDir, packages = c("plotly","plotly.express"), ignore_inst
 use_virtualenv(VenvDir, required = TRUE)
 
 # read data
-PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
+PoliceFirearms <- read.csv(here::here("armas-de-fuego","compras_armas_final_web.csv"))
 
 # server logic to process data
 shinyServer(function(input, output) {
