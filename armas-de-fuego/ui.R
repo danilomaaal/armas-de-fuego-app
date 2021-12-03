@@ -16,7 +16,7 @@ library(dplyr)
 library(plotly)
 
 # read data
-PoliceFirearms <- read.csv(here::here("data/processed","compras_armas_final_web.csv"))
+PoliceFirearms <- read.csv(here::here("armas-de-fuego","compras_armas_final_web.csv"))
 
 # theme
 shinytheme("sandstone")
@@ -80,7 +80,8 @@ shinyUI(
             tabPanel("Desglose",
                      uiOutput("treemap"),
                      helpText(
-                       HTML("<b>*Haz click sobre un cuadro para ver en detalle.</b><br>")
+                       HTML("Haz click sobre un cuadro para ver en detalle.<br>
+                            Nota: Costos en dólares de 2019.<br>")
                        )
                      ),
             tabPanel("Costo",
