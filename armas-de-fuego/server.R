@@ -11,15 +11,20 @@ library(shiny)
 library(reticulate)
 library(tidyr)
 
-# local python config and imports
-use_virtualenv(virtualenv = here::here("env/"), required = TRUE)
+# python venv config needed to deploy in shinyapps.io
+# also check .Rprofile
+VenvDir = Sys.getenv('VENV_')
+PythonPath = Sys.getenv('PYTHON_PATH_')
+virtualenv_create(envname = VenvDir, python = PythonPath)
+virtualenv_install(VenvDir, packages = c("plotly","plotly.express"), ignore_installed=TRUE)
+use_virtualenv(VenvDir, required = TRUE)
 
 # python imports
 px <- import("plotly.express")
 py_plotly <- import("plotly")
 
 # read data
-PoliceFirearms <- read.csv(here::here("armas-de-fuego","compras_armas_final_web.csv"))
+PoliceFirearms <- read.csv(here::here("compras_armas_final_web.csv"))
 
 # server logic to process data
 shinyServer(function(input, output) {

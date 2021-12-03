@@ -16,7 +16,7 @@ library(dplyr)
 library(plotly)
 
 # read data
-PoliceFirearms <- read.csv(here::here("armas-de-fuego","compras_armas_final_web.csv"))
+PoliceFirearms <- read.csv(here::here("compras_armas_final_web.csv"))
 
 # theme
 shinytheme("sandstone")
