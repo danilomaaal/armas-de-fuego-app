@@ -80,7 +80,8 @@ shinyUI(
             tabPanel("Desglose",
                      uiOutput("treemap"),
                      helpText(
-                       HTML("<b>*Haz click sobre un cuadro para ver en detalle.</b><br>")
+                       HTML("Haz click sobre un cuadro para ver en detalle.<br>
+                            Nota: Costos en dólares de 2019.<br>")
                        )
                      ),
             tabPanel("Costo",
