@@ -292,7 +292,7 @@ shinyServer(function(input, output) {
                 ),
                 showlegend = TRUE) %>%
         layout(
-          title = glue::glue("Gasto y total de armas de fuego distribuidas: {input$state} 2006-2018"),
+          title = glue::glue("Gasto y total de armas de fuego distribuidas: {paste0(input$state,' ',input$years[1],'-',input$years[2]) }"),
           yaxis = list(title = "Dólares constantes de 2019"),
           margin = list(l = 65),
           autosize = TRUE)
