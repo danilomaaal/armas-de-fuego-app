@@ -79,24 +79,24 @@ shinyServer(function(input, output) {
                  ano <= input$years[2],
                  estado == input$state) %>%
           group_by(marca) %>%
-          summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
+          summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
         } else if(input$state=="Nacional" & input$checkbox==TRUE){
           PoliceFirearms %>%
             filter(ano >= input$years[1],
                    ano <= input$years[2]) %>%
             group_by(marca) %>%
-            summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
+            summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
         } else if (input$state=="Nacional" & input$checkbox==FALSE){
           PoliceFirearms %>%
             filter(ano == input$year) %>%
             group_by(marca) %>%
-            summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
+            summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
         } else {
           PoliceFirearms %>%
             filter(ano == input$year,
                    estado == input$state) %>%
             group_by(marca) %>%
-            summarize(cost=round(sum(en_dolares_2019,na.rm = TRUE),2))
+            summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
         } 
       })
     
@@ -108,7 +108,7 @@ shinyServer(function(input, output) {
                  ano <= input$years[2]) %>%
           mutate(estado="Nacional") %>%
           group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-          summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
                     piezas=sum(no_piezas, na.rm = TRUE))
         
       } else if(input$state!="Nacional" & input$checkbox==TRUE){
@@ -118,21 +118,21 @@ shinyServer(function(input, output) {
                  ano <= input$years[2],
                  estado == input$state) %>% 
           group_by(estado, tipo_es, pais_origen_empresa,marca, calibre) %>%
-          summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
                     piezas=sum(no_piezas, na.rm = TRUE))
       } else if (input$state=="Nacional" & input$checkbox==FALSE){
         PoliceFirearms %>%
           filter(ano == input$year) %>%
           mutate(estado="Nacional") %>%
           group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-          summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
                     piezas=sum(no_piezas, na.rm = TRUE)) 
         } else {
           PoliceFirearms %>%
             filter(ano == input$year,
                    estado == input$state) %>%
             group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-            summarise(costo=round(sum(en_dolares_2019,na.rm = TRUE),2),
+            summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
                       piezas=sum(no_piezas, na.rm = TRUE)) 
         }
       })
@@ -180,14 +180,14 @@ shinyServer(function(input, output) {
              ano <= input$years[2],
              estado == input$state) %>%
           group_by(ano) %>%
-          summarize(costo=sum(en_dolares_2019, na.rm = TRUE),
+          summarize(costo=sum(en_pesos_2019, na.rm = TRUE),
                     piezas=sum(no_piezas, na.rm = TRUE))
         } else {
           PoliceFirearms %>%
             filter(ano >= input$years[1],
                    ano <= input$years[2]) %>%
             group_by(ano) %>%
-            summarize(costo=sum(en_dolares_2019, na.rm = TRUE),
+            summarize(costo=sum(en_pesos_2019, na.rm = TRUE),
                       piezas=sum(no_piezas, na.rm = TRUE))
           }
       })
@@ -293,7 +293,7 @@ shinyServer(function(input, output) {
                 showlegend = TRUE) %>%
         layout(
           title = glue::glue("Gasto y total de armas de fuego distribuidas: {paste0(input$state,' ',input$years[1],'-',input$years[2]) }"),
-          yaxis = list(title = "Dólares constantes de 2019"),
+          yaxis = list(title = "Pesos constantes de 2019"),
           margin = list(l = 65),
           autosize = TRUE)
       

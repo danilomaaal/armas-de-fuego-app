@@ -81,7 +81,7 @@ shinyUI(
                      uiOutput("treemap"),
                      helpText(
                        HTML("Haz click sobre un cuadro para ver en detalle.<br>
-                            Nota: Costos en dólares de 2019.<br>")
+                            Nota: Costo en pesos de 2019.<br>")
                        )
                      ),
             tabPanel("Costo",
