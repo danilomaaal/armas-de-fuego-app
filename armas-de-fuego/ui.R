@@ -106,7 +106,7 @@ shinyUI(
         las autoridades locales cometieran violaciones de derechos humanos. En el caso de México,
         esta prohibición se encontraba vigente para los estados de Chiapas, Chihuahua, Guerrero y Jalisco.<br>
         <br>
-        Este actno no ocurrió exclusivamente por responsabilidad de la empresa alemanna, en México la SEDENA es la única autoridad facultada para importar armas de fuego.
+        Este acto no ocurrió exclusivamente por responsabilidad de la empresa alemana, en México la SEDENA es la única autoridad facultada para importar armas de fuego.
         De acuerdo con declaraciones de testigos, <a href='https://www.rosalux.org.mx/juicio-heckler'> el personal de H&K sugirió a la SEDENA que
         en la documentación evitara mencionar a estos estados o que los substituyera con los nombres de otros</a>.
         Las omisiones antes señaladas salieron a la luz debido a que algunos de estos rifles terminaron
@@ -115,7 +115,8 @@ shinyUI(
         Esta app busca mostrar mediante visualizaciones los datos de algunas de esas transferencias. Se pueden consultar los datos de esos
         estados particulares. Si bien el tráfico ilegal de armas de fuego es un grave problema en México,
         es importante también mejorar/transparentar los mecanismos nacionales de distribución de armas para asegurar que se cumpla con los criterios de 
-        las licencias de usuario final.
+        las licencias de usuario final. En la pestaña marcada como <b>flujo</> podrás observar que en algunas transancciones en las que no se especificó 
+        la autoridad final que recibió el arma.
                  "))
     )
   )
