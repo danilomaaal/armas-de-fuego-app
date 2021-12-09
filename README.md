@@ -11,6 +11,8 @@ Código para generar una Shiny app en R que permite visualizar datos sobre trans
 Se trata de documentación obtenida a través de la solicitud de información *#0000700176018*. La base de datos y la metodología con la que se contruyó se encuentran disponibles para descarga [aquí](https://www.stopusarmstomexico.org/police-firearms-database).
  
 ![Treemap](assets/treemap.png)
+
+Para ver la app accede [aquí](https://daniel-mata.shinyapps.io/).
  
 ## Descarcar datos y limpiar base 
 
@@ -21,7 +23,7 @@ me@compu:~$  git clone git@github.com:ildanilo/armas-de-fuego-app.git
 
 me@compu:~$ cd armas-de-fuego-app/
 
-me@compu:~$ Rscript utils/clean_data.R 
+me@compu:~$ Rscript utils/DownloadAndCleanData.R 
 
 ```
 ## Configurar un ambiente Python para habilitar R reticulate 
