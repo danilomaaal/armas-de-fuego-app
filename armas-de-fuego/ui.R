@@ -115,8 +115,8 @@ shinyUI(
         Esta app busca mostrar mediante visualizaciones los datos de algunas de esas transferencias. Se pueden consultar los datos de esos
         estados particulares. Si bien el tráfico ilegal de armas de fuego es un grave problema en México,
         es importante también mejorar/transparentar los mecanismos nacionales de distribución de armas para asegurar que se cumpla con los criterios de 
-        las licencias de usuario final. En la pestaña marcada como <b>flujo</> podrás observar que en algunas transancciones en las que no se especificó 
-        la autoridad final que recibió el arma.
+        las licencias de usuario final. En la pestaña marcada como 'flujo' podrás observar que en algunas transancciones <b> no se especificó 
+        la autoridad final que recibió el arma</b>.
                  "))
     )
   )

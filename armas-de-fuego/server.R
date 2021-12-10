@@ -47,6 +47,7 @@ shinyServer(function(input, output) {
     </ol>
     Aunque este ejercicio busca dar una idea de la distribución de armas de fuego, 
     las consideraciones anteriores obligan a <b> tomar con reserva las cifras que se muestran en estas visualizaciones</b>.
+    El código de esta app se encuentra disponible en <a href='https://github.com/danilo-mal/armas-de-fuego-app'>GitHub</a>.
                      "),
                 footer=modalButton("Entendido")))
   
