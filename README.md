@@ -12,7 +12,7 @@ Se trata de documentación obtenida a través de la solicitud de información *#
  
 ![Treemap](assets/treemap.png)
 
-Para ver la app accede [aquí](https://daniel-mata.shinyapps.io/).
+Para ver la app accede [aquí](https://daniel-mata.shinyapps.io/armas-de-fuego/).
  
 ## Descarcar datos y limpiar base 
 
