@@ -103,7 +103,7 @@ shinyServer(function(input, output) {
                  ano <= input$years[2]) %>%
           mutate(estado="Nacional") %>%
           group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
+          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
                     piezas=sum(no_piezas, na.rm = TRUE))
         
       } else if(input$state!="Nacional" & input$checkbox==TRUE){
@@ -113,21 +113,21 @@ shinyServer(function(input, output) {
                  ano <= input$years[2],
                  estado == input$state) %>% 
           group_by(estado, tipo_es, pais_origen_empresa,marca, calibre) %>%
-          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
+          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
                     piezas=sum(no_piezas, na.rm = TRUE))
       } else if (input$state=="Nacional" & input$checkbox==FALSE){
         PoliceFirearms %>%
           filter(ano == input$year) %>%
           mutate(estado="Nacional") %>%
           group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
+          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
                     piezas=sum(no_piezas, na.rm = TRUE)) 
         } else {
           PoliceFirearms %>%
             filter(ano == input$year,
                    estado == input$state) %>%
             group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-            summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),2),
+            summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
                       piezas=sum(no_piezas, na.rm = TRUE)) 
         }
       })
@@ -233,8 +233,8 @@ shinyServer(function(input, output) {
                          rgb(pycolors[1], pycolors[2], pycolors[3], maxColorValue=255)
                        }
     )
-    # genereta palette
-    pypalette <- grDevices::colorRampPalette(c(pycolors[1], pycolors[7]))
+    # gen palette
+    pypalette <- grDevices::colorRampPalette(c(pycolors[7],pycolors[1]))
     
     # ----------- render functions -----------
     
@@ -289,6 +289,7 @@ shinyServer(function(input, output) {
         layout(
           title = glue::glue("Gasto y total de armas de fuego distribuidas: {paste0(input$state,' ',input$years[1],'-',input$years[2]) }"),
           yaxis = list(title = "Pesos constantes de 2019"),
+          hovermode = "x unified",
           margin = list(l = 65),
           autosize = TRUE)
       
@@ -304,11 +305,13 @@ shinyServer(function(input, output) {
                 ),
                 showlegend = TRUE) %>%
         layout(
+          xaxis = list(title = "Año"),
           yaxis = list(title = "Total de armas"),
           margin = list(l = 65),
+          hovermode = "x unified",
           autosize = TRUE)
       
-      subplot(costos,total,nrows = 2, shareX = FALSE, shareY = FALSE, titleY=TRUE)
+      subplot(costos,total,nrows = 2, shareX = TRUE, shareY = FALSE, titleY=TRUE)
       
     })
     
@@ -317,16 +320,16 @@ shinyServer(function(input, output) {
       data <- SankeyOutputFunction() 
       
       data <- TransformSankeyData(data)
-        
+      
+      nodelabels <- c("", unique(data[[2]]), unique(data[[3]]))
         
         plot_ly(
           type = "sankey",
           orientation = "h",
           node = list(
-            label = c("",
-                      unique(data[[2]]),
-                      unique(data[[3]])),
-            color = pypalette(70),
+            label = nodelabels,
+            color = ifelse(nodelabels == "No especificado",
+                           pycolors[1], pypalette(70)),
             pad = 15,
             thickness = 20,
             line = list(

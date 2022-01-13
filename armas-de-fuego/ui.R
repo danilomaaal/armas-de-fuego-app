@@ -24,7 +24,7 @@ shinytheme("sandstone")
 # user interface scheme
 shinyUI(
   fluidPage(
-    # this tag will override default shiny blue color in select inputs and tabs to a nicer green
+    # this tag will override default shiny blue color in select inputs and tabs to a nicer green and pink
     tags$style(HTML("
     .js-irs-0 .irs-bar,
     .irs--shiny .irs-from,
@@ -36,8 +36,8 @@ shinyUI(
     border-bottom:none;
 }
 .nav-tabs > li > a {
-  color: #029B9E;
-}")), titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales en México"),
+  color:#C75DAB;
+}")), titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales y municipales en México"),
     sidebarLayout(
       sidebarPanel(
         selectInput("state",
