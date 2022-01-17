@@ -24,7 +24,7 @@ shinytheme("sandstone")
 # user interface scheme
 shinyUI(
   fluidPage(
-    # this tag will override default shiny blue color in select inputs and tabs to a nicer green
+    # this tag will override default shiny blue color in select inputs and tabs to a nicer green and pink
     tags$style(HTML("
     .js-irs-0 .irs-bar,
     .irs--shiny .irs-from,
@@ -36,8 +36,8 @@ shinyUI(
     border-bottom:none;
 }
 .nav-tabs > li > a {
-  color: #029B9E;
-}")), titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales en México"),
+  color:#C75DAB;
+}")), titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales y municipales en México"),
     sidebarLayout(
       sidebarPanel(
         selectInput("state",
@@ -106,7 +106,7 @@ shinyUI(
         las autoridades locales cometieran violaciones de derechos humanos. En el caso de México,
         esta prohibición se encontraba vigente para los estados de Chiapas, Chihuahua, Guerrero y Jalisco.<br>
         <br>
-        Este acto no ocurrió exclusivamente por responsabilidad de la empresa alemana, en México la SEDENA es la única autoridad facultada para importar armas de fuego.
+        Este actno no ocurrió exclusivamente por responsabilidad de la empresa alemanna, en México la SEDENA es la única autoridad facultada para importar armas de fuego.
         De acuerdo con declaraciones de testigos, <a href='https://www.rosalux.org.mx/juicio-heckler'> el personal de H&K sugirió a la SEDENA que
         en la documentación evitara mencionar a estos estados o que los substituyera con los nombres de otros</a>.
         Las omisiones antes señaladas salieron a la luz debido a que algunos de estos rifles terminaron
@@ -115,8 +115,7 @@ shinyUI(
         Esta app busca mostrar mediante visualizaciones los datos de algunas de esas transferencias. Se pueden consultar los datos de esos
         estados particulares. Si bien el tráfico ilegal de armas de fuego es un grave problema en México,
         es importante también mejorar/transparentar los mecanismos nacionales de distribución de armas para asegurar que se cumpla con los criterios de 
-        las licencias de usuario final. En la pestaña marcada como 'flujo' podrás observar que en algunas transancciones <b> no se especificó 
-        la autoridad final que recibió el arma</b>.
+        las licencias de usuario final.
                  "))
     )
   )
