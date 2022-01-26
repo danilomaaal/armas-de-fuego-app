@@ -275,7 +275,7 @@ shinyServer(function(input, output) {
       ) %>%
         layout(title = SetTitles("Gasto en armas de fuego: "),
                barmode = "group",
-               xaxis = list(title = "Dólares constantes de 2019"),
+               xaxis = list(title = "Pesos constantes de 2019"),
                yaxis = list(title = ""))
     })
     
