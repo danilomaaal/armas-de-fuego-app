@@ -5,7 +5,8 @@
 #          \  (oo)____
 #             (__)    )\
 #                ||--|| *
-  
+
+
 # paquetes
 require(dplyr)
 require(tidyr)
@@ -88,6 +89,7 @@ facturas %<>%
 	                                  ifelse(pais_origen_empresa=="Estado Unidos","Estados Unidos",pais_origen_empresa)),
 	       calibre=ifelse(calibre=="NA","Sin dato",calibre),
 	       pais_origen_empresa=replace_na(pais_origen_empresa,"Sin dato"),
+	       nacional="Nacional"
 	       )
 
 
@@ -140,30 +142,31 @@ facturas$en_dolares_2019 <- adjust_for_inflation(facturas$costo_usd, facturas$an
 
 # arrange data
 facturas %<>% 
-	select(estado,
-		usuario_agencia_estatal,
-		usuario_municipal,
-		vendido_a_cliente,
-		fecha,
-		mes,
-		dia,
-		ano,
-		factura_no,
-		marca,
-		tipo_en,
-		tipo_es,
-		semi_auto_auto_n_a,
-		calibre,
-		pais_origen_empresa,
-		pais_origen_empresa_en,
-		no_piezas,
-		costo_pesos_mex,
-		costo_usd,
-		en_pesos_2019,
-		en_dolares_2019
+	select(nacional,
+	       estado,
+	       usuario_agencia_estatal,
+	       usuario_municipal,
+	       vendido_a_cliente,
+	       fecha,
+	       mes,
+	       dia,
+	       ano,
+	       factura_no,
+	       marca,
+	       tipo_en,
+	       tipo_es,
+	       semi_auto_auto_n_a,
+	       calibre,
+	       pais_origen_empresa,
+	       pais_origen_empresa_en,
+	       no_piezas,
+	       costo_pesos_mex,
+	       costo_usd,
+	       en_pesos_2019,
+	       en_dolares_2019
 	)
 
 # export data in csv file
 write.csv(facturas,here::here("armas-de-fuego","compras_armas_final_web.csv"),
           fileEncoding = "UTF-8", row.names = FALSE)
-#end.
+

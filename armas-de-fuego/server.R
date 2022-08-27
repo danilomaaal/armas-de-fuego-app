@@ -68,30 +68,21 @@ shinyServer(function(input, output) {
   
   # plot filter functions
     BarOutputFunction <- reactive({
-      if(input$state!="Nacional" & input$checkbox==TRUE){
+      if(input$state=="Nacional" & input$checkbox==TRUE){
         PoliceFirearms %>%
-          filter(ano >= input$years[1],
-                 ano <= input$years[2],
-                 estado == input$state) %>%
-          group_by(marca) %>%
-          summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
-        } else if(input$state=="Nacional" & input$checkbox==TRUE){
+          filter_pnational(., ano, input$years[1], input$years[2], marca,
+                           en_pesos_2019)
+        } else if(input$state!="Nacional" & input$checkbox==TRUE){
           PoliceFirearms %>%
-            filter(ano >= input$years[1],
-                   ano <= input$years[2]) %>%
-            group_by(marca) %>%
-            summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
+            filter_pstate(., ano, input$years[1], input$years[2], estado,
+                          input$state, marca, en_pesos_2019)
         } else if (input$state=="Nacional" & input$checkbox==FALSE){
           PoliceFirearms %>%
-            filter(ano == input$year) %>%
-            group_by(marca) %>%
-            summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
+            filter_national(., ano, input$year, marca, en_pesos_2019)
         } else {
           PoliceFirearms %>%
-            filter(ano == input$year,
-                   estado == input$state) %>%
-            group_by(marca) %>%
-            summarize(cost=round(sum(en_pesos_2019,na.rm = TRUE),2))
+            filter_state(., ano, input$year, estado, input$state, marca,
+                         en_pesos_2019)
         } 
       })
     
@@ -136,6 +127,7 @@ shinyServer(function(input, output) {
     SankeyOutputFunction <- reactive({
       
       if (input$state=="Nacional" & input$checkbox==TRUE) {
+        
         PoliceFirearms %>%
           filter(!is.na(marca),
                  ano >= input$years[1],
@@ -189,30 +181,50 @@ shinyServer(function(input, output) {
     
 
     # ----------- regular functions -----------
+    # Note to self: 
+    # Ploty uses numbers to represent nodes from sankey,
+    # this function dynamically generates labels for each node:
 
-    # sankey plot uses numbers to represent nodes,
-    # this funtion transforms labels 
-      TransformSankeyData <- function(data_frame){
-        
-        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,1:2], as.factor))
-        data_frame <- as.data.frame(lapply(data_frame, unclass))
-        names(data_frame) <- c("lab_making","lab_state","values","source","target")
-        data_frame[,4:5] <- as.data.frame(lapply(data_frame[,4:5], as.numeric))
-        data_frame$target <- data_frame$target + max(data_frame$source)
-        
-        makings <- data_frame %>%
-          dplyr::arrange(source) %>%
-          pull(lab_making)
-        
-        state <- data_frame %>%
-          dplyr::arrange(target) %>%
-          pull(lab_state)
-        
-        transformedData <- list(data_frame,makings,state)
-        
-        return(transformedData)
-    }
+TransformSankeyData <- function(data){
+    # first we need to format columns one and two (corresponding to company names
+    # and states) as factors, then generate copies of the formatted columns
+    # and place them in places four and five of the data frame 
+  data[,4:5] <- as.data.frame(lapply(data[,1:2], as.factor))
     
+    # by removing the class from a factor variable, 
+    # R automatically converts it to a numerical one, i.e. 
+    # each category is assigned a unique number consecutively
+  data <- as.data.frame(lapply(data, unclass))
+    # now let´s change the names of the columns according to the 
+    # functions they´ll fulfill for the Sankey
+  names(data) <- c("lab_making","lab_state","values","source","target")
+    # because we used the lapply function, columns 4 and 5 were transformed
+    # to string format, which is not readable for plotly.
+    # So let's convert them back to numeric format.
+
+  data[,4:5] <- as.data.frame(lapply(data[,4:5], as.numeric))
+    # The following is to make a small transformation, because the plotly sankeys
+    # use consecutive numbers to assign the nodes we need to avoid that the numbers
+    # of the two categories overlap so we take the maximum value of the source 
+    # and add it to each of the values of the target, 
+    # e.g. if the maximum in the source is 29 then
+    # target: 10 + 29 --->> 39
+    # target: 2 + 29 --->> 31
+  data$target <- data$target + max(data$source, na.rm = TRUE)
+    # now let's extract the labels, we use the function arrange so that 
+    # all of them are arranged consecutively, that is, they are not mixed up
+  makings <- data %>%
+      dplyr::arrange(source) %>%
+      pull(lab_making)
+    # the same for state labels
+  state <- data %>%
+      dplyr::arrange(target) %>%
+      pull(lab_state)
+    # return list with generated tags and data frame
+  transformedData <- list(data,makings,state)
+  return(transformedData)
+}
+    #TODO: replace this ugly function
     SetTitles <- function(tema){
       glue::glue("{ paste0(tema,
       ifelse(input$checkbox==TRUE,
@@ -235,6 +247,47 @@ shinyServer(function(input, output) {
     )
     # gen palette
     pypalette <- grDevices::colorRampPalette(c(pycolors[7],pycolors[1]))
+    
+    # filtering functions
+    filter_pstate <- function(data, year, year_beggin, year_end, state, selected_st, vars, to_aggregate) {
+      filtered_data <- data %>%
+        filter(if_any({{ vars }}, ~ !is.na(.x) ),
+                {{ year }} >= {{ year_beggin }},
+                {{ year }} <= {{ year_end }},
+                {{ state }} == {{ selected_st }} ) %>%
+        group_by(across({{ vars }})) %>%
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
+      return(filtered_data)
+    }
+    
+    filter_pnational <- function(data, year, year_beggin, year_end, vars, to_aggregate) {
+      filtered_data <- data %>%
+        filter(if_any({{ vars }}, ~ !is.na(.x) ),
+               {{ year }} >= {{ year_beggin }},
+               {{ year }} <= {{ year_end }}) %>%
+        group_by(across({{ vars }})) %>%
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
+      return(filtered_data)
+    }
+    
+    filter_state <- function(data, year, selected_yr, state, selected_st, vars, to_aggregate) {
+      filtered_data <- data %>%
+        filter(if_any({{ vars }}, ~ !is.na(.x) ),
+               {{ year }} == {{ selected_yr }},
+               {{ state }} == {{ selected_st }} ) %>%
+        group_by(across( {{ vars }} )) %>%
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
+      return(filtered_data)
+    }
+    
+    filter_national <- function(data, year, selected_yr, vars, to_aggregate) {
+      filtered_data <- data %>%
+        filter( {{ year }} == {{ selected_yr }}) %>%
+        group_by(across({{ vars }})) %>%
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
+      return(filtered_data)
+    }
+    
     
     # ----------- render functions -----------
     
@@ -264,7 +317,7 @@ shinyServer(function(input, output) {
     output$barplot <- renderPlotly({
       
       BarOutputFunction() %>%
-      plot_ly(x = ~cost, y = ~reorder(marca, cost), type = "bar", orientation = "h",
+      plot_ly(x = ~tot_en_pesos_2019, y = ~reorder(marca, tot_en_pesos_2019), type = "bar", orientation = "h",
               marker = list(color = pycolors[3],line = list(color = pycolors[3], width = 1.5))
       ) %>%
         layout(title = SetTitles("Gasto en armas de fuego: "),
@@ -321,6 +374,11 @@ shinyServer(function(input, output) {
       
       data <- TransformSankeyData(data)
       
+    # Note: the initial empty string "" concatenated to unique 
+    #  labels from makes and states is for compensation, 
+    # remove it and the tags will appear one space
+    # out of place, not sure why. Best guess: since plotly is
+    # based on d3.js, it starts enumerating from 0 while R starts from 1 (?)
       nodelabels <- c("", unique(data[[2]]), unique(data[[3]]))
         
         plot_ly(
