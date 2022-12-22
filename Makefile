@@ -8,6 +8,7 @@
 #---
 
 SCRIPTS := scripts
+INPUT := data
 
 download:
 	Rscript --vanilla $(SCRIPTS)/get_data.R;
@@ -19,3 +20,7 @@ env:
 
 run:
 	Rscript -e 'shiny::runApp("armas-de-fuego")'
+
+clean:
+	@echo "Cleaning $(INPUT)";
+	rm -r $(INPUT);

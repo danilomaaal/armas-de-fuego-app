@@ -17,3 +17,4 @@ armas-de-fuego/rsconnect/
 
 # temporal data
 data/
+*.csv
