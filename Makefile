@@ -9,9 +9,11 @@
 
 SCRIPTS := scripts
 INPUT := data
+PYENV := env
+
 
 download:
-	Rscript --vanilla $(SCRIPTS)/get_data.R;
+	Rscript --vanilla $(SCRIPTS)/get_cleandata.R;
 
 env:
 	python3 -m venv env; \
@@ -19,8 +21,9 @@ env:
         pip install -r requirements.txt	
 
 run:
-	Rscript -e 'shiny::runApp("armas-de-fuego")'
+	@echo "Running shiny app..."
+	Rscript -e 'shiny::runApp("armas-de-fuego", port=4699)'
 
 clean:
-	@echo "Cleaning $(INPUT)";
-	rm -r $(INPUT);
+	@echo "Removing python $(PYENV)";
+	rm -rf $(PYENV);
