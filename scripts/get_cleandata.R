@@ -1,7 +1,7 @@
 # vim set fileencoding=utf-8:
 
 #---
-# script name: get_data.R
+# script name: get_cleandata.R
 # purpose: obtains data for shiny app
 # author: Daniel Mata <daniel.mata@flacso.edu.mx>
 # date created: 18-12-2022
@@ -14,8 +14,19 @@ require(magrittr)
 require(stringr)
 require(priceR)
 
-#get data
-system("scripts/download.sh")
+# make dirs and download data
+if (dir.exists("data")){
+  message("Data already downloaded")
+  } else {
+    # url
+    firearms  <- "https://stopusarmstomexico.org/wp-content/uploads/2020/12/Armas_Policias_Mexico.xlsx"
+    # download stuff
+    dir.create("data/raw", recursive = TRUE)
+    download.file(firearms,"data/raw/Armas_Policias_Mexico.xlsx")
+    message("Ok!")
+}
+
+#--------- start processing -------------
 
 # read
 facturas <- readxl::read_excel(here::here("data/raw","Armas_Policias_Mexico.xlsx"))
@@ -88,8 +99,7 @@ facturas |>
 	       pais_origen_empresa=ifelse(pais_origen_empresa=="n.a.","Sin dato",
 	                                  ifelse(pais_origen_empresa=="Estado Unidos","Estados Unidos",pais_origen_empresa)),
 	       calibre=ifelse(calibre=="NA","Sin dato",calibre),
-	       pais_origen_empresa=replace_na(pais_origen_empresa,"Sin dato"),
-	       nacional="Nacional"
+	       pais_origen_empresa=replace_na(pais_origen_empresa,"Sin dato")
 	       ) -> facturas
 
 # fix some accents
@@ -138,8 +148,7 @@ facturas$en_dolares_2019 <- adjust_for_inflation(facturas$costo_usd, facturas$an
 
 # arrange data
 facturas |> 
-	select(nacional,
-	       estado,
+	select(estado,
 	       usuario_agencia_estatal,
 	       usuario_municipal,
 	       vendido_a_cliente,

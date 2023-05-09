@@ -1,12 +1,14 @@
-#  _______________________________
-# < Hi. This is the server logic. >
-#  -------------------------------
-#        \   ,__,
-#         \  (oo)____
-#            (__)    )\
-#               ||--|| *
+# vim set fileencoding=utf-8:
 
-# import packages
+#---
+# file name: server.R
+# purpose: runs shiny app server
+# author: Daniel Mata <daniel.mata@flacso.edu.mx>
+# date created: 02-11-2021
+# license: (c) DM, 2021, GPL v2
+#---
+
+# packages
 library(shiny)
 library(reticulate)
 library(tidyr)
@@ -52,7 +54,7 @@ shinyServer(function(input, output) {
     
     if(input$checkbox==FALSE){
       # check for available data
-      available  <- SankeyOutputFunction() %>%
+      available  <- SankeyOutputFunction() |>
         nrow()
   
         if(available == 0) {
@@ -62,101 +64,73 @@ shinyServer(function(input, output) {
         }
              
       } else{
-        paste0("Datos a nivel ", input$state," para el periodo ",paste(input$years[1],input$years[2], sep="-"),".")
+        paste0("Datos a nivel ", input$state," para el periodo ", paste(input$years[1], input$years[2], sep="-"),".")
         }
     })
   
   # plot filter functions
     BarOutputFunction <- reactive({
-      if(input$state=="Nacional" & input$checkbox==TRUE){
-        PoliceFirearms %>%
-          filter_pnational(., ano, input$years[1], input$years[2], marca,
-                           en_pesos_2019)
-        } else if(input$state!="Nacional" & input$checkbox==TRUE){
-          PoliceFirearms %>%
-            filter_pstate(., ano, input$years[1], input$years[2], estado,
-                          input$state, marca, en_pesos_2019)
-        } else if (input$state=="Nacional" & input$checkbox==FALSE){
-          PoliceFirearms %>%
-            filter_national(., ano, input$year, marca, en_pesos_2019)
-        } else {
-          PoliceFirearms %>%
-            filter_state(., ano, input$year, estado, input$state, marca,
+	    if(input$state=="Nacional" & input$checkbox==TRUE){
+		PoliceFirearms |>
+		    filter_pnational(ano, input$years[1], input$years[2], marca, en_pesos_2019)
+      } else if(input$state!="Nacional" & input$checkbox==TRUE){
+		PoliceFirearms |>
+		  filter_pstate(ano, input$years[1], input$years[2], estado, input$state, marca, en_pesos_2019)
+      } else if(input$state=="Nacional" & input$checkbox==FALSE){
+		PoliceFirearms |>
+		  filter_national(ano, input$year, marca, en_pesos_2019)
+      } else {
+          PoliceFirearms |>
+            filter_state(ano, input$year, estado, input$state, marca,
                          en_pesos_2019)
-        } 
+	    }
       })
     
     TreemapOutputFunction <- reactive({
       
       if (input$state=="Nacional" & input$checkbox==TRUE) {
-        PoliceFirearms %>%
-          filter(ano >= input$years[1],
-                 ano <= input$years[2]) %>%
-          mutate(estado="Nacional") %>%
-          group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
-                    piezas=sum(no_piezas, na.rm = TRUE))
-        
+        PoliceFirearms |>
+	mutate(estado="Nacional") |>
+	filter_pnational(ano, input$years[1], input$years[2],
+			 vars = c(estado, tipo_es, pais_origen_empresa, marca, calibre),
+				to_aggregate = c(en_pesos_2019, no_piezas))
       } else if(input$state!="Nacional" & input$checkbox==TRUE){
-        
-        PoliceFirearms %>%
-          filter(ano >= input$years[1],
-                 ano <= input$years[2],
-                 estado == input$state) %>% 
-          group_by(estado, tipo_es, pais_origen_empresa,marca, calibre) %>%
-          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
-                    piezas=sum(no_piezas, na.rm = TRUE))
+	      PoliceFirearms |>
+	      filter_pstate(ano, input$years[1], input$years[2], estado, input$state, 
+			    vars=c(estado, tipo_es, pais_origen_empresa, marca, calibre),
+		            to_aggregate=c(en_pesos_2019, no_piezas)) 
+
       } else if (input$state=="Nacional" & input$checkbox==FALSE){
-        PoliceFirearms %>%
-          filter(ano == input$year) %>%
-          mutate(estado="Nacional") %>%
-          group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-          summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
-                    piezas=sum(no_piezas, na.rm = TRUE)) 
+        PoliceFirearms |>
+        mutate(estado="Nacional") |>
+        filter_national(ano, input$year,
+		      vars=c(estado, tipo_es, pais_origen_empresa, marca, calibre),
+		      to_aggregate=c(en_pesos_2019, no_piezas))
+
         } else {
-          PoliceFirearms %>%
-            filter(ano == input$year,
-                   estado == input$state) %>%
-            group_by(estado, tipo_es, pais_origen_empresa, marca, calibre) %>%
-            summarise(costo=round(sum(en_pesos_2019,na.rm = TRUE),1),
-                      piezas=sum(no_piezas, na.rm = TRUE)) 
+          PoliceFirearms |>
+            filter_state(ano, input$year, estado, input$state,
+			 vars=c(estado, tipo_es, pais_origen_empresa, marca, calibre),
+			 to_aggregate=c(en_pesos_2019,no_piezas))
+
         }
       })
     
     
     SankeyOutputFunction <- reactive({
       
-      if (input$state=="Nacional" & input$checkbox==TRUE) {
-        
-        PoliceFirearms %>%
-          filter(!is.na(marca),
-                 ano >= input$years[1],
-                 ano <= input$years[2]) %>%
-          group_by(marca,estado) %>%
-          summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
-        
+      if(input$state=="Nacional" & input$checkbox==TRUE) {
+	      PoliceFirearms |>
+	      filter_pnational(ano, input$years[1], input$years[2], vars=c(marca,estado), to_aggregate=c(no_piezas))
       } else if(input$state!="Nacional" & input$checkbox==TRUE){
-        
-        PoliceFirearms %>%
-          filter(!is.na(marca),
-                 ano >= input$years[1],
-                 ano <= input$years[2],
-                 estado==input$state) %>%
-          group_by(marca,vendido_a_cliente) %>%
-          summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
+	      PoliceFirearms |>
+	      filter_pstate(ano, input$years[1], input$years[2], estado, input$state, vars=c(marca, vendido_a_cliente), to_aggregate=c(no_piezas))
       } else if (input$state=="Nacional" & input$checkbox==FALSE){
-        PoliceFirearms %>%
-          filter(!is.na(marca),
-                 ano == input$year) %>%
-          group_by(marca,estado) %>%
-          summarize(piezas=sum(no_piezas, na.rm = TRUE))  
+	      PoliceFirearms |>
+	      filter_national(ano, input$year, vars=c(marca, estado),to_aggregate=c(no_piezas))
       } else {
-        PoliceFirearms %>%
-          filter(!is.na(marca),
-                 ano == input$year,
-                 estado == input$state) %>%
-          group_by(marca,vendido_a_cliente) %>%
-          summarize(piezas=sum(no_piezas, na.rm = TRUE)) 
+	      PoliceFirearms |>
+	      filter_state(ano, input$year, estado, input$state, vars=c(marca,vendido_a_cliente), to_aggregate=c(no_piezas))
       }
     })
     
@@ -181,50 +155,116 @@ shinyServer(function(input, output) {
     
 
     # ----------- regular functions -----------
-    # Note to self: 
-    # Ploty uses numbers to represent nodes from sankey,
-    # this function dynamically generates labels for each node:
+
+# filtering functions
+    # state by period
+    filter_pstate <- function(data, year, year_beggin, year_end, state, selected_st, vars, to_aggregate) {
+      data |>
+        filter(if_any({{ vars }}, ~ !is.na(.x) ),
+                {{ year }} >= {{ year_beggin }},
+                {{ year }} <= {{ year_end }},
+                {{ state }} == {{ selected_st }} ) |>
+        group_by(across({{ vars }})) |>
+        summarize(across({{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "total_{.col}" ) ) -> filtered_data
+
+      return(filtered_data)
+    }
+    # national by period
+    filter_pnational <- function(data, year, year_beggin, year_end, vars, to_aggregate) {
+      data |>
+        filter(if_any({{ vars }}, ~ !is.na(.x) ),
+               {{ year }} >= {{ year_beggin }},
+               {{ year }} <= {{ year_end }}) |>
+        group_by(across({{ vars }})) |>
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "total_{.col}" )) -> filtered_data
+
+      return(filtered_data)
+    }
+    # state by year
+    filter_state <- function(data, year, selected_yr, state, selected_st, vars, to_aggregate) {
+      data |>
+        filter(if_any({{ vars }}, ~ !is.na(.x) ),
+               {{ year }} == {{ selected_yr }},
+               {{ state }} == {{ selected_st }} ) |>
+        group_by(across( {{ vars }} )) |>
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "total_{.col}" )) -> filtered_data
+
+      return(filtered_data)
+    }
+    # national by year
+    filter_national <- function(data, year, selected_yr, vars, to_aggregate) {
+      data |>
+        filter( {{ year }} == {{ selected_yr }}) |>
+        group_by(across({{ vars }})) |>
+        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "total_{.col}" )) -> filtered_data
+
+      return(filtered_data)
+    }
+
+#   __________________________________________________________
+#  / Note to self:                                            \
+# | Ploty uses numbers to represent nodes in sankey plots,     |
+# | the next function is important bc dynamically generates    |
+#  \  labels for each node.                                   /
+#   ----------------------------------------------------------
+#        \   ,__,
+#         \  (oo)____
+#            (__)    )\
+#              ||--|| *
 
 TransformSankeyData <- function(data){
-    # first we need to format columns one and two (corresponding to company names
-    # and states) as factors, then generate copies of the formatted columns
-    # and place them in places four and five of the data frame 
+# format columns one and two as factors,
+# generate copies of the formatted columns
+# and place them in places four and five of the data frame:
+
   data[,4:5] <- as.data.frame(lapply(data[,1:2], as.factor))
-    
-    # by removing the class from a factor variable, 
-    # R automatically converts it to a numerical one, i.e. 
-    # each category is assigned a unique number consecutively
+
+# by removing the class from a factor variable,
+# R automatically converts it to a numerical one, i.e.
+# each category is assigned a unique number consecutively:
+
   data <- as.data.frame(lapply(data, unclass))
-    # now let´s change the names of the columns according to the 
-    # functions they´ll fulfill for the Sankey
+
+# now let´s change the names of the columns according to the
+# functions they´ll fulfill for the Sankey:
+
   names(data) <- c("lab_making","lab_state","values","source","target")
-    # because we used the lapply function, columns 4 and 5 were transformed
-    # to string format, which is not readable for plotly.
-    # So let's convert them back to numeric format.
+
+# because we used the lapply function, columns 4 and 5 were transformed
+# to string format, which is not readable for plotly. So let's convert them back to numeric format:
 
   data[,4:5] <- as.data.frame(lapply(data[,4:5], as.numeric))
-    # The following is to make a small transformation, because the plotly sankeys
-    # use consecutive numbers to assign the nodes we need to avoid that the numbers
-    # of the two categories overlap so we take the maximum value of the source 
-    # and add it to each of the values of the target, 
-    # e.g. if the maximum in the source is 29 then
-    # target: 10 + 29 --->> 39
-    # target: 2 + 29 --->> 31
+
+# The following is to make a small transformation, bc plotly sankeys
+# use consecutive numbers to assign the nodes, we need to avoid that the numbers
+# of the two categories overlap. So we take the maximum value of the source
+# and add it to each of the values of the target,
+# e.g. if the maximum in the source is 29 then
+# target: 10 + 29 --->> 39
+# target: 2 + 29 --->> 31
+
   data$target <- data$target + max(data$source, na.rm = TRUE)
-    # now let's extract the labels, we use the function arrange so that 
-    # all of them are arranged consecutively, that is, they are not mixed up
-  makings <- data %>%
-      dplyr::arrange(source) %>%
-      pull(lab_making)
-    # the same for state labels
-  state <- data %>%
-      dplyr::arrange(target) %>%
-      pull(lab_state)
-    # return list with generated tags and data frame
+
+# now let's extract the labels, we use the function arrange so that
+# all of them are arranged consecutively:
+
+  data |>
+      dplyr::arrange(source) |>
+      pull(lab_making) -> makings
+
+# the same for state labels:
+
+  data |>
+      dplyr::arrange(target) |>
+      pull(lab_state) -> state
+
+#TODO:fix mislabel bug in this function
+# return list with generated tags and data frame
   transformedData <- list(data,makings,state)
   return(transformedData)
 }
-    #TODO: replace this ugly function
+
+    #TODO: replace this
     SetTitles <- function(tema){
       glue::glue("{ paste0(tema,
       ifelse(input$checkbox==TRUE,
@@ -248,46 +288,6 @@ TransformSankeyData <- function(data){
     # gen palette
     pypalette <- grDevices::colorRampPalette(c(pycolors[7],pycolors[1]))
     
-    # filtering functions
-    filter_pstate <- function(data, year, year_beggin, year_end, state, selected_st, vars, to_aggregate) {
-      filtered_data <- data %>%
-        filter(if_any({{ vars }}, ~ !is.na(.x) ),
-                {{ year }} >= {{ year_beggin }},
-                {{ year }} <= {{ year_end }},
-                {{ state }} == {{ selected_st }} ) %>%
-        group_by(across({{ vars }})) %>%
-        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
-      return(filtered_data)
-    }
-    
-    filter_pnational <- function(data, year, year_beggin, year_end, vars, to_aggregate) {
-      filtered_data <- data %>%
-        filter(if_any({{ vars }}, ~ !is.na(.x) ),
-               {{ year }} >= {{ year_beggin }},
-               {{ year }} <= {{ year_end }}) %>%
-        group_by(across({{ vars }})) %>%
-        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
-      return(filtered_data)
-    }
-    
-    filter_state <- function(data, year, selected_yr, state, selected_st, vars, to_aggregate) {
-      filtered_data <- data %>%
-        filter(if_any({{ vars }}, ~ !is.na(.x) ),
-               {{ year }} == {{ selected_yr }},
-               {{ state }} == {{ selected_st }} ) %>%
-        group_by(across( {{ vars }} )) %>%
-        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
-      return(filtered_data)
-    }
-    
-    filter_national <- function(data, year, selected_yr, vars, to_aggregate) {
-      filtered_data <- data %>%
-        filter( {{ year }} == {{ selected_yr }}) %>%
-        group_by(across({{ vars }})) %>%
-        summarize(across( {{ to_aggregate }}, ~ round(sum(.x, na.rm = TRUE), 2), .names = "tot_{.col}" ) )
-      return(filtered_data)
-    }
-    
     
     # ----------- render functions -----------
     
@@ -295,17 +295,17 @@ TransformSankeyData <- function(data){
      output$treemap <- renderUI({
       
       data <- TreemapOutputFunction()
-      
+
       HTML(
         py_plotly$offline$plot(
           py_plotly$graph_objects$Figure(
             px$treemap(
               data_frame = data,
               path = c("estado","tipo_es","pais_origen_empresa","marca","calibre"),
-              values = "piezas",
-              color="costo",
+              values = "total_no_piezas",
+              color = "total_en_pesos_2019",
               color_continuous_scale=pycolors,
-              color_continuous_midpoint=weighted.mean(data$costo,data$piezas)
+              color_continuous_midpoint=weighted.mean(data$total_en_pesos_2019,data$total_no_piezas)
             )
           )$update_layout(title_text = SetTitles("Detalle del flujo: ")),
           output_type = "div"
@@ -317,7 +317,7 @@ TransformSankeyData <- function(data){
     output$barplot <- renderPlotly({
       
       BarOutputFunction() %>%
-      plot_ly(x = ~tot_en_pesos_2019, y = ~reorder(marca, tot_en_pesos_2019), type = "bar", orientation = "h",
+      plot_ly(x = ~total_en_pesos_2019, y = ~reorder(marca, total_en_pesos_2019), type = "bar", orientation = "h",
               marker = list(color = pycolors[3],line = list(color = pycolors[3], width = 1.5))
       ) %>%
         layout(title = SetTitles("Gasto en armas de fuego: "),
@@ -400,7 +400,7 @@ TransformSankeyData <- function(data){
             target = data[[1]][["target"]],
             value = data[[1]][["values"]]
           )
-        ) %>%
+        ) |>
           layout(title = SetTitles("Flujo legal de armas de fuego: ") )
     
       })

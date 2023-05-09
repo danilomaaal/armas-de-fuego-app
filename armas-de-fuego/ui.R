@@ -1,12 +1,12 @@
-#  ________________________________________
-# / Hello. This is my first Shiny web app. \
-# |    LOL. Here is the user interface     |
-# \ definition.                            /
-#  ----------------------------------------
-#        \   ,__,
-#         \  (oo)____
-#            (__)    )\
-#               ||--|| *
+# vim set fileencoding=utf-8:
+
+#---
+# file name: ui.R
+# purpose: sets user interface
+# author: Daniel Mata <daniel.mata@flacso.edu.mx>
+# date created: 02-11-2021
+# license: (c) DM, 2021, GPL v2
+#---
 
 # import packages
 library(shiny)
