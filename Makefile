@@ -12,7 +12,7 @@ INPUT := data
 PYENV := env
 
 
-download:
+getdata:
 	Rscript --vanilla $(SCRIPTS)/get_cleandata.R;
 
 env:
