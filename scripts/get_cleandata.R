@@ -1,27 +1,39 @@
-#  _____________________________
-# < Cleaning script for dataset >
-#  -----------------------------
-#         \   ,__,
-#          \  (oo)____
-#             (__)    )\
-#                ||--|| *
-  
-# paquetes
+# vim set fileencoding=utf-8:
+
+#---
+# script name: get_cleandata.R
+# purpose: obtains data for shiny app
+# author: Daniel Mata <daniel.mata@flacso.edu.mx>
+# date created: 18-12-2022
+# license: (c) DM, 2022, GPL v3
+#---
+
 require(dplyr)
 require(tidyr)
 require(magrittr)
 require(stringr)
 require(priceR)
 
-#import data from stop us arms
-system("utils/download.sh")
+# make dirs and download data
+if (dir.exists("data")){
+  message("Data already downloaded")
+  } else {
+    # url
+    firearms  <- "https://stopusarmstomexico.org/wp-content/uploads/2020/12/Armas_Policias_Mexico.xlsx"
+    # download stuff
+    dir.create("data/raw", recursive = TRUE)
+    download.file(firearms,"data/raw/Armas_Policias_Mexico.xlsx")
+    message("Ok!")
+}
 
-# read data
+#--------- start processing -------------
+
+# read
 facturas <- readxl::read_excel(here::here("data/raw","Armas_Policias_Mexico.xlsx"))
 
 # clean names and translate vars
-facturas %<>%
-       	janitor::clean_names() %>%
+facturas |>
+       	janitor::clean_names() |>
 	mutate(tipo_es=recode(tipo,
 			      "Ametralladora"="Ametralladoras",
 			      "Carabina"="Carabinas",
@@ -74,8 +86,8 @@ facturas %<>%
 		     			     "n.a."=NA_character_,
 				     	     "República Checa"="Czech Republic",
 			     		     "Suiza"="Switzerland",
-			     		     "Turquía"="Turkey"))  %>% 
-  tidyr::unite('vendido_a_cliente', usuario_agencia_estatal:usuario_municipal,remove = FALSE) %>%
+			     		     "Turquía"="Turkey"))  |> 
+  tidyr::unite('vendido_a_cliente', usuario_agencia_estatal:usuario_municipal,remove = FALSE) |>
 	mutate(vendido_a_cliente=str_replace(vendido_a_cliente, "_NA|NA_", ""),
 	       vendido_a_cliente=recode(vendido_a_cliente,
 	                                "n.a."=NA_character_,
@@ -87,12 +99,8 @@ facturas %<>%
 	       pais_origen_empresa=ifelse(pais_origen_empresa=="n.a.","Sin dato",
 	                                  ifelse(pais_origen_empresa=="Estado Unidos","Estados Unidos",pais_origen_empresa)),
 	       calibre=ifelse(calibre=="NA","Sin dato",calibre),
-	       pais_origen_empresa=replace_na(pais_origen_empresa,"Sin dato"),
-	       )
-
-
-
-
+	       pais_origen_empresa=replace_na(pais_origen_empresa,"Sin dato")
+	       ) -> facturas
 
 # fix some accents
 facturas$vendido_a_cliente <- str_replace(facturas$vendido_a_cliente, "cion", "ción")
@@ -112,7 +120,7 @@ armas_fuego <- c("Ametralladoras", "Carabinas","Escopetas", "Rifles",
                  "Pistolas", "Pistolas ametralladoras","Revólveres", "Subametralladoras")
 
 # filter data base on years and firearms types
-facturas <- facturas %>%
+facturas <- facturas |>
   filter(ano >= 2006 & ano <= 2018, # years between 2006 and 2018
          tipo_es %in% armas_fuego) # filter only firearms 
 
@@ -139,31 +147,30 @@ facturas$en_pesos_2019 <- adjust_for_inflation(facturas$costo_pesos_mex, factura
 facturas$en_dolares_2019 <- adjust_for_inflation(facturas$costo_usd, facturas$ano, "US", to_date = 2019)
 
 # arrange data
-facturas %<>% 
+facturas |> 
 	select(estado,
-		usuario_agencia_estatal,
-		usuario_municipal,
-		vendido_a_cliente,
-		fecha,
-		mes,
-		dia,
-		ano,
-		factura_no,
-		marca,
-		tipo_en,
-		tipo_es,
-		semi_auto_auto_n_a,
-		calibre,
-		pais_origen_empresa,
-		pais_origen_empresa_en,
-		no_piezas,
-		costo_pesos_mex,
-		costo_usd,
-		en_pesos_2019,
-		en_dolares_2019
-	)
+	       usuario_agencia_estatal,
+	       usuario_municipal,
+	       vendido_a_cliente,
+	       fecha,
+	       mes,
+	       dia,
+	       ano,
+	       factura_no,
+	       marca,
+	       tipo_en,
+	       tipo_es,
+	       semi_auto_auto_n_a,
+	       calibre,
+	       pais_origen_empresa,
+	       pais_origen_empresa_en,
+	       no_piezas,
+	       costo_pesos_mex,
+	       costo_usd,
+	       en_pesos_2019,
+	       en_dolares_2019
+	) -> facturas
 
 # export data in csv file
 write.csv(facturas,here::here("armas-de-fuego","compras_armas_final_web.csv"),
           fileEncoding = "UTF-8", row.names = FALSE)
-#end.

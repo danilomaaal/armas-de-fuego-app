@@ -6,3 +6,4 @@
 #Sys.setenv(PYTHON_PATH_ = "python3")
 #Sys.setenv(VENV_ = VENV_) 
 #Sys.setenv(RETICULATE_PYTHON = paste0("/home/shiny/.virtualenvs/", VENV_, "/bin/python"))
+options(browser="firefox")

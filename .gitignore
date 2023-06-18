@@ -8,5 +8,13 @@
 
 #virtual env
 env/
+
 # shinyapp.io
 armas-de-fuego/rsconnect/
+
+#vim
+*.swp
+
+# temporal data
+data/
+*.csv
