@@ -1,12 +1,12 @@
-#  ________________________________________
-# / Hello. This is my first Shiny web app. \
-# |    LOL. Here is the user interface     |
-# \ definition.                            /
-#  ----------------------------------------
-#        \   ,__,
-#         \  (oo)____
-#            (__)    )\
-#               ||--|| *
+# vim set fileencoding=utf-8:
+
+#---
+# file name: ui.R
+# purpose: sets user interface
+# author: Daniel Mata <daniel.mata@flacso.edu.mx>
+# date created: 02-11-2021
+# license: (c) DM, 2021, GPL v2
+#---
 
 # import packages
 library(shiny)
@@ -24,7 +24,7 @@ shinytheme("sandstone")
 # user interface scheme
 shinyUI(
   fluidPage(
-    # this tag will override default shiny blue color in select inputs and tabs to a nicer green and pink
+    # this tag will override default shiny blue color in select inputs and tabs to green
     tags$style(HTML("
     .js-irs-0 .irs-bar,
     .irs--shiny .irs-from,
@@ -36,7 +36,7 @@ shinyUI(
     border-bottom:none;
 }
 .nav-tabs > li > a {
-  color:#C75DAB;
+  color:#029B9E;
 }")), titlePanel(title = "Armas de fuego distribuidas por la SEDENA a autoridades estatales y municipales en México"),
     sidebarLayout(
       sidebarPanel(
@@ -106,14 +106,14 @@ shinyUI(
         las autoridades locales cometieran violaciones de derechos humanos. En el caso de México,
         esta prohibición se encontraba vigente para los estados de Chiapas, Chihuahua, Guerrero y Jalisco.<br>
         <br>
-        Este actno no ocurrió exclusivamente por responsabilidad de la empresa alemanna, en México la SEDENA es la única autoridad facultada para importar armas de fuego.
+        Este acto no ocurrió sólo por responsabilidad de la empresa alemana, en México la SEDENA es la única autoridad facultada para importar armas de fuego.
         De acuerdo con declaraciones de testigos, <a href='https://www.rosalux.org.mx/juicio-heckler'> el personal de H&K sugirió a la SEDENA que
-        en la documentación evitara mencionar a estos estados o que los substituyera con los nombres de otros</a>.
-        Las omisiones antes señaladas salieron a la luz debido a que algunos de estos rifles terminaron
-        en manos de los policías municipales de Iguala, Guerrero, que participaron en la desaparición de los normalistas de Ayotzinapa el 26 de septiembre de 2014.<br>
+        evitara mencionar a estos estados en la documentación, o que los substituyera con los nombres de otros</a>.
+        Las omisiones antes señaladas salieron a la luz lugo de que algunos de esos rifles terminaron
+        en manos de policías municipales de Iguala (Guerrero), que participaron en la desaparición de los normalistas de Ayotzinapa el 26 de septiembre de 2014.<br>
         <br>
-        Esta app busca mostrar mediante visualizaciones los datos de algunas de esas transferencias. Se pueden consultar los datos de esos
-        estados particulares. Si bien el tráfico ilegal de armas de fuego es un grave problema en México,
+        Esta app busca mostrar los datos de algunas de esas transferencias. Se pueden consultar los datos de esos
+        estados particulares. Si bien el tráfico ilegal de armas de fuego es un gran problema en México,
         es importante también mejorar/transparentar los mecanismos nacionales de distribución de armas para asegurar que se cumpla con los criterios de 
         las licencias de usuario final.
                  "))
